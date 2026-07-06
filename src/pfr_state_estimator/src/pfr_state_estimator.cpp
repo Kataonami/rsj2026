@@ -17,13 +17,13 @@
 namespace
 {
 constexpr std::array<const char *, 3> kRightJointNames = {
-  "joint1", "joint2", "joint3"};
+  "joint1_R", "joint2_R", "joint3_R"};
 constexpr std::array<const char *, 3> kLeftJointNames = {
-  "joint4", "joint5", "joint6"};
+  "joint1_L", "joint2_L", "joint3_L"};
 constexpr std::array<const char *, 3> kRightModelJointNames = {
-  "Joint1_R", "Joint2_R", "Joint3_R"};
+  "joint1_R", "joint2_R", "joint3_R"};
 constexpr std::array<const char *, 3> kLeftModelJointNames = {
-  "Joint1_L", "Joint2_L", "Joint3_L"};
+  "joint1_L", "joint2_L", "joint3_L"};
 
 template<std::size_t N>
 sensor_msgs::msg::JointState selectJointStates(
@@ -120,9 +120,9 @@ PfrStateEstimator::PfrStateEstimator()
   const auto urdf_path =
     this->declare_parameter<std::string>("urdf_path", default_urdf_path);
   const auto right_ee_frame =
-    this->declare_parameter<std::string>("right_ee_frame", "Joint3_R");
+    this->declare_parameter<std::string>("right_ee_frame", "joint3_R");
   const auto left_ee_frame =
-    this->declare_parameter<std::string>("left_ee_frame", "Joint3_L");
+    this->declare_parameter<std::string>("left_ee_frame", "joint3_L");
   kinematics_->base_frame_id =
     this->declare_parameter<std::string>("base_frame_id", "base_link");
 

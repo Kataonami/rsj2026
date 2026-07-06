@@ -8,6 +8,8 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
+    urdf_path = LaunchConfiguration("urdf_path")
+    start_hardware = LaunchConfiguration("start_hardware")
 
     dynamixel_bringup = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -17,7 +19,11 @@ def generate_launch_description():
                 "bringup.launch.py",
             ])
         ),
-        launch_arguments={"use_sim_time": use_sim_time}.items(),
+        launch_arguments={
+            "use_sim_time": use_sim_time,
+            "urdf_path": urdf_path,
+            "start_hardware": start_hardware,
+        }.items(),
     )
 
     state_estimator = Node(
@@ -25,13 +31,29 @@ def generate_launch_description():
         executable="pfr_state_estimator",
         name="pfr_state_estimator",
         output="screen",
-        parameters=[{"use_sim_time": use_sim_time}],
+        parameters=[{
+            "use_sim_time": use_sim_time,
+            "urdf_path": urdf_path,
+        }],
     )
 
     return LaunchDescription([
         DeclareLaunchArgument(
             "use_sim_time",
             default_value="false",
+        ),
+        DeclareLaunchArgument(
+            "urdf_path",
+            default_value=PathJoinSubstitution([
+                FindPackageShare("PFR_Arm2"),
+                "PFR_Arm2.urdf",
+            ]),
+            description="Common PFR URDF used by Dynamixel and State Estimator.",
+        ),
+        DeclareLaunchArgument(
+            "start_hardware",
+            default_value="true",
+            description="Start the Dynamixel hardware and ros2_control controllers.",
         ),
         dynamixel_bringup,
         state_estimator,

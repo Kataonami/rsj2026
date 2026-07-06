@@ -14,12 +14,12 @@ controller_manager:
 dxl_velocity_controller:
   ros__parameters:
     joints:
-      - joint1
-      - joint2
-      - joint3
+      - joint1_R
+      - joint2_R
+      - joint3_R
 
 
 # dxl_current_controller:
 #   ros__parameters:
 #     joints:
-#       - joint3
+#       - joint3_R

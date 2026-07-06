@@ -26,7 +26,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/base_link.STL" />
+          filename="package://PFR_Arm2/meshes/base_link.STL" />
       </geometry>
       <material
         name="">
@@ -40,12 +40,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/base_link.STL" />
+          filename="package://PFR_Arm2/meshes/base_link.STL" />
       </geometry>
     </collision>
   </link>
   <link
-    name="Joint1_R">
+    name="joint1_R">
     <inertial>
       <origin
         xyz="-9.31857326154312E-11 -0.195378541069816 0.00672546665364099"
@@ -66,7 +66,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint1_R.STL" />
+          filename="package://PFR_Arm2/meshes/Joint1_R.STL" />
       </geometry>
       <material
         name="">
@@ -80,12 +80,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint1_R.STL" />
+          filename="package://PFR_Arm2/meshes/Joint1_R.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Joint1_R"
+    name="joint1_R"
     type="revolute">
     <origin
       xyz="0 -0.18175 0.174"
@@ -93,7 +93,7 @@
     <parent
       link="base_link" />
     <child
-      link="Joint1_R" />
+      link="joint1_R" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -105,7 +105,7 @@
       damping="0.02" />
   </joint>
   <link
-    name="Joint2_R">
+    name="joint2_R">
     <inertial>
       <origin
         xyz="-8.81578836366647E-10 -0.205753132187302 0.00699863753540647"
@@ -126,7 +126,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint2_R.STL" />
+          filename="package://PFR_Arm2/meshes/Joint2_R.STL" />
       </geometry>
       <material
         name="">
@@ -140,20 +140,20 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint2_R.STL" />
+          filename="package://PFR_Arm2/meshes/Joint2_R.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Joint2_R"
+    name="joint2_R"
     type="revolute">
     <origin
       xyz="0 -0.3 0.00950000000000006"
       rpy="0 0 0" />
     <parent
-      link="Joint1_R" />
+      link="joint1_R" />
     <child
-      link="Joint2_R" />
+      link="joint2_R" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -165,7 +165,7 @@
       damping="0.02" />
   </joint>
   <link
-    name="Joint3_R">
+    name="joint3_R">
     <inertial>
       <origin
         xyz="-7.37750807914269E-05 -0.0311442464401741 0.00549599281689406"
@@ -186,7 +186,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint3_R.STL" />
+          filename="package://PFR_Arm2/meshes/Joint3_R.STL" />
       </geometry>
       <material
         name="">
@@ -200,20 +200,20 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint3_R.STL" />
+          filename="package://PFR_Arm2/meshes/Joint3_R.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Joint3_R"
+    name="joint3_R"
     type="revolute">
     <origin
       xyz="0 -0.3 0.00949999999999965"
       rpy="0 0 0" />
     <parent
-      link="Joint2_R" />
+      link="joint2_R" />
     <child
-      link="Joint3_R" />
+      link="joint3_R" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -225,7 +225,7 @@
       damping="0.02" />
   </joint>
   <link
-    name="Joint1_L">
+    name="joint1_L">
     <inertial>
       <origin
         xyz="9.31857192870736E-11 0.195378541069816 0.00672546665364096"
@@ -246,7 +246,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint1_L.STL" />
+          filename="package://PFR_Arm2/meshes/Joint1_L.STL" />
       </geometry>
       <material
         name="">
@@ -260,12 +260,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint1_L.STL" />
+          filename="package://PFR_Arm2/meshes/Joint1_L.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Joint1_L"
+    name="joint1_L"
     type="revolute">
     <origin
       xyz="0 0.18175 0.174"
@@ -273,7 +273,7 @@
     <parent
       link="base_link" />
     <child
-      link="Joint1_L" />
+      link="joint1_L" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -285,7 +285,7 @@
       damping="0.02" />
   </joint>
   <link
-    name="Joint2_L">
+    name="joint2_L">
     <inertial>
       <origin
         xyz="8.81578823250344E-10 0.205753132187302 0.00699863753540644"
@@ -306,7 +306,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint2_L.STL" />
+          filename="package://PFR_Arm2/meshes/Joint2_L.STL" />
       </geometry>
       <material
         name="">
@@ -320,20 +320,20 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint2_L.STL" />
+          filename="package://PFR_Arm2/meshes/Joint2_L.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Joint2_L"
+    name="joint2_L"
     type="revolute">
     <origin
       xyz="0 0.3 0.00950000000000006"
       rpy="0 0 0" />
     <parent
-      link="Joint1_L" />
+      link="joint1_L" />
     <child
-      link="Joint2_L" />
+      link="joint2_L" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -345,7 +345,7 @@
       damping="0.02" />
   </joint>
   <link
-    name="Joint3_L">
+    name="joint3_L">
     <inertial>
       <origin
         xyz="7.37750807914593E-05 0.0311442464401742 0.00549599281689406"
@@ -366,7 +366,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint3_L.STL" />
+          filename="package://PFR_Arm2/meshes/Joint3_L.STL" />
       </geometry>
       <material
         name="">
@@ -380,20 +380,20 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="./meshes/Joint3_L.STL" />
+          filename="package://PFR_Arm2/meshes/Joint3_L.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Joint3_L"
+    name="joint3_L"
     type="revolute">
     <origin
       xyz="0 0.3 0.00949999999999965"
       rpy="0 0 0" />
     <parent
-      link="Joint2_L" />
+      link="joint2_L" />
     <child
-      link="Joint3_L" />
+      link="joint3_L" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -404,4 +404,76 @@
     <dynamics
       damping="0.02" />
   </joint>
+
+  <!-- Right-arm Dynamixel hardware interfaces.  The same robot description is
+       consumed by ros2_control, robot_state_publisher, and Pinocchio. -->
+  <ros2_control name="dxl_system" type="system">
+    <hardware>
+      <plugin>dynamixel_hardware_interface/DynamixelHardware</plugin>
+
+      <param name="port_name">/dev/ttyUSB0</param>
+      <param name="baud_rate">57600</param>
+      <param name="error_timeout_ms">1000</param>
+      <param name="dynamixel_model_folder">/param/dxl_model</param>
+      <param name="disable_torque_at_init">true</param>
+
+      <param name="dynamixel_state_pub_msg_name">/dynamixel_hardware_interface/dxl_state</param>
+      <param name="get_dynamixel_data_srv_name">/dynamixel_hardware_interface/get_dxl_data</param>
+      <param name="set_dynamixel_data_srv_name">/dynamixel_hardware_interface/set_dxl_data</param>
+      <param name="reboot_dxl_srv_name">/dynamixel_hardware_interface/reboot_dxl</param>
+      <param name="set_dxl_torque_srv_name">/dynamixel_hardware_interface/set_dxl_torque</param>
+
+      <param name="number_of_joints">3</param>
+      <param name="number_of_transmissions">3</param>
+      <param name="transmission_to_joint_matrix">1, 0, 0, 0, 1, 0, 0, 0, 1</param>
+      <param name="joint_to_transmission_matrix">1, 0, 0, 0, 1, 0, 0, 0, 1</param>
+    </hardware>
+
+    <joint name="joint1_R">
+      <command_interface name="velocity" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
+    </joint>
+    <joint name="joint2_R">
+      <command_interface name="velocity" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
+    </joint>
+    <joint name="joint3_R">
+      <command_interface name="velocity" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
+    </joint>
+
+    <gpio name="dxl1">
+      <param name="type">dxl</param>
+      <param name="ID">1</param>
+      <param name="Operating Mode">1</param>
+      <command_interface name="Goal Velocity" />
+      <state_interface name="Present Position" />
+      <state_interface name="Present Velocity" />
+      <state_interface name="Present Current" />
+    </gpio>
+    <gpio name="dxl2">
+      <param name="type">dxl</param>
+      <param name="ID">2</param>
+      <param name="Operating Mode">1</param>
+      <command_interface name="Goal Velocity" />
+      <state_interface name="Present Position" />
+      <state_interface name="Present Velocity" />
+      <state_interface name="Present Current" />
+    </gpio>
+    <gpio name="dxl3">
+      <param name="type">dxl</param>
+      <param name="ID">3</param>
+      <param name="Operating Mode">1</param>
+      <command_interface name="Goal Velocity" />
+      <state_interface name="Present Position" />
+      <state_interface name="Present Velocity" />
+      <state_interface name="Present Current" />
+    </gpio>
+  </ros2_control>
 </robot>
