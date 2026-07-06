@@ -2,6 +2,7 @@ from pathlib import Path
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
@@ -12,6 +13,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
     urdf_path = LaunchConfiguration("urdf_path")
     start_hardware = LaunchConfiguration("start_hardware")
+    start_rviz = LaunchConfiguration("start_rviz")
     launch_dir = Path(__file__).resolve().parent
 
     joy = IncludeLaunchDescription(
@@ -50,6 +52,31 @@ def generate_launch_description():
         }],
     )
 
+    path_visualizer = Node(
+        package="pfr_rviz_visualization",
+        executable="ee_path_visualizer",
+        name="pfr_ee_path_visualizer",
+        output="screen",
+        parameters=[{"use_sim_time": use_sim_time}],
+    )
+
+    rviz = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        condition=IfCondition(start_rviz),
+        output="screen",
+        arguments=[
+            "-d",
+            PathJoinSubstitution([
+                FindPackageShare("pfr_rviz_visualization"),
+                "config",
+                "pfr_control.rviz",
+            ]),
+        ],
+        parameters=[{"use_sim_time": use_sim_time}],
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             "use_sim_time",
@@ -69,8 +96,15 @@ def generate_launch_description():
             default_value="true",
             description="Start the Dynamixel hardware and ros2_control controllers.",
         ),
+        DeclareLaunchArgument(
+            "start_rviz",
+            default_value="false",
+            description="Start RViz with desired and actual end-effector paths.",
+        ),
         pfr_bringup,
         joy,
         high_level_controller,
         low_level_controller,
+        path_visualizer,
+        rviz,
     ])

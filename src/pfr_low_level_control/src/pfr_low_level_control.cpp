@@ -53,6 +53,7 @@ bool solvePlanarPositionIk(
   double second_link_length,
   double first_link_angle,
   double second_link_angle,
+  const Eigen::Vector3d & joint_axis_signs,
   const Eigen::Vector3d & lower_limits,
   const Eigen::Vector3d & upper_limits,
   Eigen::Vector3d & desired_q)
@@ -81,11 +82,16 @@ bool solvePlanarPositionIk(
       second_link_length * std::sin(elbow_angle),
       first_link_length + second_link_length * std::cos(elbow_angle));
 
+    // For each planar joint, theta = theta_zero + axis_sign * q.  The right-arm
+    // joints in the common URDF rotate about -Z, so their axis signs are -1.
     Eigen::Vector3d candidate;
-    candidate[0] = wrapAngle(first_link_world_angle - first_link_angle);
+    candidate[0] = wrapAngle(
+      (first_link_world_angle - first_link_angle) / joint_axis_signs[0]);
     candidate[1] = wrapAngle(
-      elbow_angle - second_link_angle + first_link_angle);
-    candidate[2] = wrapAngle(desired_yaw - candidate[0] - candidate[1]);
+      (elbow_angle - second_link_angle + first_link_angle) / joint_axis_signs[1]);
+    candidate[2] = wrapAngle(
+      (desired_yaw - joint_axis_signs[0] * candidate[0] -
+      joint_axis_signs[1] * candidate[1]) / joint_axis_signs[2]);
 
     bool within_limits = true;
     for (Eigen::Index index = 0; index < candidate.size(); ++index) {
@@ -127,6 +133,7 @@ struct PfrLowLevelControl::ControllerState
   Eigen::Vector2d first_joint_position{Eigen::Vector2d::Zero()};
   Eigen::Vector3d lower_limits{Eigen::Vector3d::Zero()};
   Eigen::Vector3d upper_limits{Eigen::Vector3d::Zero()};
+  Eigen::Vector3d joint_axis_signs{Eigen::Vector3d::Ones()};
   double first_link_length{0.0};
   double second_link_length{0.0};
   double first_link_angle{0.0};
@@ -225,6 +232,27 @@ PfrLowLevelControl::PfrLowLevelControl()
       throw std::runtime_error("Right end-effector frame not found: " + ee_frame);
     }
     controller_->ee_frame_id = controller_->model.getBodyId(ee_frame);
+
+    Eigen::Matrix<double, 6, Eigen::Dynamic> neutral_jacobian(
+      6, controller_->model.nv);
+    neutral_jacobian.setZero();
+    pinocchio::computeFrameJacobian(
+      controller_->model, *controller_->data, controller_->q,
+      controller_->ee_frame_id, pinocchio::LOCAL_WORLD_ALIGNED,
+      neutral_jacobian);
+    for (std::size_t index = 0; index < controller_->v_indices.size(); ++index) {
+      const double angular_z = neutral_jacobian(5, controller_->v_indices[index]);
+      if (std::abs(angular_z) < 0.5) {
+        throw std::runtime_error(
+                "Right-arm joint axis is not aligned with the planar Z axis: " +
+                std::string(kModelJointNames[index]));
+      }
+      controller_->joint_axis_signs[index] = std::copysign(1.0, angular_z);
+    }
+    RCLCPP_INFO(
+      this->get_logger(), "Right-arm planar joint axis signs: [%.0f, %.0f, %.0f].",
+      controller_->joint_axis_signs[0], controller_->joint_axis_signs[1],
+      controller_->joint_axis_signs[2]);
   } catch (const std::exception & error) {
     RCLCPP_FATAL(
       this->get_logger(), "Failed to initialize Pinocchio from '%s': %s",
@@ -372,6 +400,7 @@ void PfrLowLevelControl::controlTimerCallback()
       controller_->first_joint_position,
       controller_->first_link_length, controller_->second_link_length,
       controller_->first_link_angle, controller_->second_link_angle,
+      controller_->joint_axis_signs,
       controller_->lower_limits, controller_->upper_limits,
       desired_right_q))
   {
