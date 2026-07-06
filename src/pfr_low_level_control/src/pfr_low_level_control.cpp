@@ -148,7 +148,9 @@ struct PfrLowLevelControl::ControllerState
   bool twist_reference_received{false};
   bool command_active{false};
 
+  std::string control_mode{"generalized_jacobian"};
   double joint_position_gain{2.0};
+  double task_space_gain{2.0};
   double damping{0.05};
   double max_joint_velocity{2.0};
   double command_timeout_s{0.25};
@@ -169,8 +171,12 @@ PfrLowLevelControl::PfrLowLevelControl()
     this->declare_parameter<std::string>("right_ee_frame", "joint3_R");
   controller_->base_frame_id =
     this->declare_parameter<std::string>("base_frame_id", "base_link");
+  controller_->control_mode =
+    this->declare_parameter<std::string>("control_mode", "generalized_jacobian");
   controller_->joint_position_gain =
     this->declare_parameter<double>("joint_position_gain", 2.0);
+  controller_->task_space_gain =
+    this->declare_parameter<double>("task_space_gain", 2.0);
   controller_->damping =
     this->declare_parameter<double>("damping", 0.05);
   controller_->max_joint_velocity =
@@ -180,7 +186,14 @@ PfrLowLevelControl::PfrLowLevelControl()
   controller_->control_rate_hz =
     this->declare_parameter<double>("control_rate_hz", 50.0);
 
+  if (controller_->control_mode != "analytic_ik" &&
+    controller_->control_mode != "generalized_jacobian")
+  {
+    throw std::invalid_argument(
+            "control_mode must be 'analytic_ik' or 'generalized_jacobian'.");
+  }
   if (controller_->joint_position_gain <= 0.0 ||
+    controller_->task_space_gain <= 0.0 ||
     controller_->damping <= 0.0 || controller_->max_joint_velocity <= 0.0 ||
     controller_->command_timeout_s <= 0.0 || controller_->control_rate_hz <= 0.0)
   {
@@ -290,8 +303,8 @@ PfrLowLevelControl::PfrLowLevelControl()
 
   RCLCPP_INFO(
     this->get_logger(),
-    "Right-arm 3-DoF planar IK started with Pinocchio %s at %.1f Hz.",
-    PINOCCHIO_VERSION, controller_->control_rate_hz);
+    "Right-arm controller started in '%s' mode with Pinocchio %s at %.1f Hz.",
+    controller_->control_mode.c_str(), PINOCCHIO_VERSION, controller_->control_rate_hz);
 }
 
 PfrLowLevelControl::~PfrLowLevelControl() = default;
@@ -390,30 +403,6 @@ void PfrLowLevelControl::controlTimerCallback()
     task_jacobian(2, index) = full_jacobian(5, column);
   }
 
-  Eigen::Vector3d current_right_q;
-  for (std::size_t index = 0; index < controller_->q_indices.size(); ++index) {
-    current_right_q[index] = controller_->q[controller_->q_indices[index]];
-  }
-  Eigen::Vector3d desired_right_q;
-  if (!solvePlanarPositionIk(
-      controller_->pose_reference.pose, current_right_q,
-      controller_->first_joint_position,
-      controller_->first_link_length, controller_->second_link_length,
-      controller_->first_link_angle, controller_->second_link_angle,
-      controller_->joint_axis_signs,
-      controller_->lower_limits, controller_->upper_limits,
-      desired_right_q))
-  {
-    RCLCPP_WARN_THROTTLE(
-      this->get_logger(), *this->get_clock(), 2000,
-      "Right-hand pose reference is outside the reachable planar workspace.");
-    if (controller_->command_active) {
-      publishZeroVelocity();
-      controller_->command_active = false;
-    }
-    return;
-  }
-
   Eigen::Vector3d desired_task_velocity;
   desired_task_velocity <<
     controller_->twist_reference.twist.linear.x,
@@ -423,11 +412,59 @@ void PfrLowLevelControl::controlTimerCallback()
   const Eigen::Matrix3d damped_task_matrix =
     task_jacobian * task_jacobian.transpose() +
     std::pow(controller_->damping, 2) * Eigen::Matrix3d::Identity();
-  Eigen::Vector3d joint_velocity = task_jacobian.transpose() *
-    damped_task_matrix.ldlt().solve(desired_task_velocity);
-  for (Eigen::Index index = 0; index < joint_velocity.size(); ++index) {
-    joint_velocity[index] += controller_->joint_position_gain *
-      wrapAngle(desired_right_q[index] - current_right_q[index]);
+
+  Eigen::Vector3d joint_velocity;
+  if (controller_->control_mode == "generalized_jacobian") {
+    const auto & current_ee_pose =
+      controller_->data->oMf[controller_->ee_frame_id];
+    const double current_yaw = std::atan2(
+      current_ee_pose.rotation()(1, 0), current_ee_pose.rotation()(0, 0));
+    const double desired_yaw = quaternionYaw(
+      controller_->pose_reference.pose.orientation);
+    Eigen::Vector3d task_error;
+    task_error <<
+      controller_->pose_reference.pose.position.x - current_ee_pose.translation().x(),
+      controller_->pose_reference.pose.position.y - current_ee_pose.translation().y(),
+      wrapAngle(desired_yaw - current_yaw);
+
+    // For the current fixed-base URDF, the generalized Jacobian reduces to the
+    // active right-arm frame Jacobian.  Feed forward the reference twist and
+    // close the loop directly in task space.
+    const Eigen::Vector3d commanded_task_velocity =
+      desired_task_velocity + controller_->task_space_gain * task_error;
+    joint_velocity = task_jacobian.transpose() *
+      damped_task_matrix.ldlt().solve(commanded_task_velocity);
+  } else {
+    Eigen::Vector3d current_right_q;
+    for (std::size_t index = 0; index < controller_->q_indices.size(); ++index) {
+      current_right_q[index] = controller_->q[controller_->q_indices[index]];
+    }
+    Eigen::Vector3d desired_right_q;
+    if (!solvePlanarPositionIk(
+        controller_->pose_reference.pose, current_right_q,
+        controller_->first_joint_position,
+        controller_->first_link_length, controller_->second_link_length,
+        controller_->first_link_angle, controller_->second_link_angle,
+        controller_->joint_axis_signs,
+        controller_->lower_limits, controller_->upper_limits,
+        desired_right_q))
+    {
+      RCLCPP_WARN_THROTTLE(
+        this->get_logger(), *this->get_clock(), 2000,
+        "Right-hand pose reference is outside the reachable planar workspace.");
+      if (controller_->command_active) {
+        publishZeroVelocity();
+        controller_->command_active = false;
+      }
+      return;
+    }
+
+    joint_velocity = task_jacobian.transpose() *
+      damped_task_matrix.ldlt().solve(desired_task_velocity);
+    for (Eigen::Index index = 0; index < joint_velocity.size(); ++index) {
+      joint_velocity[index] += controller_->joint_position_gain *
+        wrapAngle(desired_right_q[index] - current_right_q[index]);
+    }
   }
 
   if (!joint_velocity.allFinite()) {

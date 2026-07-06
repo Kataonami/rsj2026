@@ -14,6 +14,7 @@ def generate_launch_description():
     urdf_path = LaunchConfiguration("urdf_path")
     start_hardware = LaunchConfiguration("start_hardware")
     start_rviz = LaunchConfiguration("start_rviz")
+    low_level_control_mode = LaunchConfiguration("low_level_control_mode")
     launch_dir = Path(__file__).resolve().parent
 
     joy = IncludeLaunchDescription(
@@ -49,6 +50,7 @@ def generate_launch_description():
             "use_sim_time": use_sim_time,
             "urdf_path": urdf_path,
             "control_rate_hz": 50.0,
+            "control_mode": low_level_control_mode,
         }],
     )
 
@@ -100,6 +102,13 @@ def generate_launch_description():
             "start_rviz",
             default_value="false",
             description="Start RViz with desired and actual end-effector paths.",
+        ),
+        DeclareLaunchArgument(
+            "low_level_control_mode",
+            default_value="generalized_jacobian",
+            description=(
+                "Low-level mode: 'generalized_jacobian' or 'analytic_ik'."
+            ),
         ),
         pfr_bringup,
         joy,
