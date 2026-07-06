@@ -1,0 +1,25 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 20
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    dxl_velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+    # dxl_current_controller:
+    #   type: effort_controllers/JointGroupEffortController
+
+dxl_velocity_controller:
+  ros__parameters:
+    joints:
+      - joint1
+      - joint2
+      - joint3
+
+
+# dxl_current_controller:
+#   ros__parameters:
+#     joints:
+#       - joint3

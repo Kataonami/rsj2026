@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="PFR_Arm2">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="2.67023784161503E-17 1.38748955932851E-17 0.185886916570362"
+        rpy="0 0 0" />
+      <mass
+        value="37.0077126301145" />
+      <inertia
+        ixx="0.724473253004157"
+        ixy="-1.86300210027573E-13"
+        ixz="-5.02319701611592E-18"
+        iyy="0.724407746640749"
+        iyz="3.75870870342342E-21"
+        izz="0.602836393608002" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Joint1_R">
+    <inertial>
+      <origin
+        xyz="-9.31857326154312E-11 -0.195378541069816 0.00672546665364099"
+        rpy="0 0 0" />
+      <mass
+        value="0.410933607210843" />
+      <inertia
+        ixx="0.00175299289156333"
+        ixy="-5.89177135842882E-12"
+        ixz="1.3984615394458E-12"
+        iyy="0.000195601668420019"
+        iyz="1.88142895656864E-05"
+        izz="0.00169629776467482" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint1_R.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint1_R.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint1_R"
+    type="revolute">
+    <origin
+      xyz="0 -0.18175 0.174"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="Joint1_R" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.57079632679"
+      upper="1.57079632679"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.02" />
+  </joint>
+  <link
+    name="Joint2_R">
+    <inertial>
+      <origin
+        xyz="-8.81578836366647E-10 -0.205753132187302 0.00699863753540647"
+        rpy="0 0 0" />
+      <mass
+        value="0.374093067317941" />
+      <inertia
+        ixx="0.00161509478193257"
+        ixy="3.84970577116986E-11"
+        ixz="9.48021605813476E-12"
+        iyy="0.000190449958941573"
+        iyz="-4.24797754234991E-06"
+        izz="0.00154274686402644" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint2_R.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint2_R.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint2_R"
+    type="revolute">
+    <origin
+      xyz="0 -0.3 0.00950000000000006"
+      rpy="0 0 0" />
+    <parent
+      link="Joint1_R" />
+    <child
+      link="Joint2_R" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-2.61799387799"
+      upper="2.61799387799"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.02" />
+  </joint>
+  <link
+    name="Joint3_R">
+    <inertial>
+      <origin
+        xyz="-7.37750807914269E-05 -0.0311442464401741 0.00549599281689406"
+        rpy="0 0 0" />
+      <mass
+        value="0.0882871164231278" />
+      <inertia
+        ixx="3.66676493897971E-05"
+        ixy="-5.00700285155369E-08"
+        ixz="1.10564509395472E-07"
+        iyy="4.02110494136869E-05"
+        iyz="-1.3169841303705E-06"
+        izz="1.64829163884356E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint3_R.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint3_R.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint3_R"
+    type="revolute">
+    <origin
+      xyz="0 -0.3 0.00949999999999965"
+      rpy="0 0 0" />
+    <parent
+      link="Joint2_R" />
+    <child
+      link="Joint3_R" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.57079632679"
+      upper="1.57079632679"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.02" />
+  </joint>
+  <link
+    name="Joint1_L">
+    <inertial>
+      <origin
+        xyz="9.31857192870736E-11 0.195378541069816 0.00672546665364096"
+        rpy="0 0 0" />
+      <mass
+        value="0.410933607210843" />
+      <inertia
+        ixx="0.00175299289156333"
+        ixy="-5.89177121781119E-12"
+        ixz="-1.39846151657399E-12"
+        iyy="0.000195601668420019"
+        iyz="-1.88142895656863E-05"
+        izz="0.00169629776467482" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint1_L.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint1_L.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint1_L"
+    type="revolute">
+    <origin
+      xyz="0 0.18175 0.174"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="Joint1_L" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.57079632679"
+      upper="1.57079632679"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.02" />
+  </joint>
+  <link
+    name="Joint2_L">
+    <inertial>
+      <origin
+        xyz="8.81578823250344E-10 0.205753132187302 0.00699863753540644"
+        rpy="0 0 0" />
+      <mass
+        value="0.374093067317941" />
+      <inertia
+        ixx="0.00161509478193257"
+        ixy="3.84970576996398E-11"
+        ixz="-9.48021602314208E-12"
+        iyy="0.000190449958941573"
+        iyz="4.2479775423505E-06"
+        izz="0.00154274686402644" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint2_L.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint2_L.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint2_L"
+    type="revolute">
+    <origin
+      xyz="0 0.3 0.00950000000000006"
+      rpy="0 0 0" />
+    <parent
+      link="Joint1_L" />
+    <child
+      link="Joint2_L" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-2.61799387799"
+      upper="2.61799387799"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.02" />
+  </joint>
+  <link
+    name="Joint3_L">
+    <inertial>
+      <origin
+        xyz="7.37750807914593E-05 0.0311442464401742 0.00549599281689406"
+        rpy="0 0 0" />
+      <mass
+        value="0.0882871164231278" />
+      <inertia
+        ixx="3.66676493897971E-05"
+        ixy="-5.00700285155311E-08"
+        ixz="-1.1056450939546E-07"
+        iyy="4.02110494136869E-05"
+        iyz="1.31698413037051E-06"
+        izz="1.64829163884356E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint3_L.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="./meshes/Joint3_L.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint3_L"
+    type="revolute">
+    <origin
+      xyz="0 0.3 0.00949999999999965"
+      rpy="0 0 0" />
+    <parent
+      link="Joint2_L" />
+    <child
+      link="Joint3_L" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.57079632679"
+      upper="1.57079632679"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.02" />
+  </joint>
+</robot>

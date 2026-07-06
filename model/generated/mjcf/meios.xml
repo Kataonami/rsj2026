@@ -1,0 +1,419 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="meios">
+  <compiler angle="radian" />
+
+  <default>
+    <default class="visual">
+      <geom type="mesh" group="2" contype="0" conaffinity="0" />
+    </default>
+    <default class="collision">
+      <geom type="mesh" group="3" />
+    </default>
+  </default>
+
+  <asset>
+    <mesh name="UR8LongWorkbench_0" file="assets/UR8LongWorkbench_0.obj" content_type="model/obj" />
+    <mesh name="UR8LongWorkbench_1" file="assets/UR8LongWorkbench_1.obj" content_type="model/obj" />
+    <mesh name="UR8LongWorkbench_2" file="assets/UR8LongWorkbench_2.obj" content_type="model/obj" />
+    <mesh name="UR8LongWorkbench_3" file="assets/UR8LongWorkbench_3.obj" content_type="model/obj" />
+    <mesh name="GraniteTable_0" file="assets/GraniteTable_0.obj" content_type="model/obj" />
+    <mesh name="GraniteTable_1" file="assets/GraniteTable_1.obj" content_type="model/obj" />
+    <mesh name="GraniteTable_2" file="assets/GraniteTable_2.obj" content_type="model/obj" />
+    <mesh name="GraniteTable_3" file="assets/GraniteTable_3.obj" content_type="model/obj" />
+    <mesh name="base_0" file="assets/base_0.obj" content_type="model/obj" />
+    <mesh name="base_1" file="assets/base_1.obj" content_type="model/obj" />
+    <mesh name="base_2" file="assets/base_2.obj" content_type="model/obj" />
+    <mesh name="shoulder_0" file="assets/shoulder_0.obj" content_type="model/obj" />
+    <mesh name="shoulder_1" file="assets/shoulder_1.obj" content_type="model/obj" />
+    <mesh name="upperarm_0" file="assets/upperarm_0.obj" content_type="model/obj" />
+    <mesh name="upperarm_1" file="assets/upperarm_1.obj" content_type="model/obj" />
+    <mesh name="upperarm_2" file="assets/upperarm_2.obj" content_type="model/obj" />
+    <mesh name="upperarm_3" file="assets/upperarm_3.obj" content_type="model/obj" />
+    <mesh name="forearm_0" file="assets/forearm_0.obj" content_type="model/obj" />
+    <mesh name="forearm_1" file="assets/forearm_1.obj" content_type="model/obj" />
+    <mesh name="forearm_2" file="assets/forearm_2.obj" content_type="model/obj" />
+    <mesh name="forearm_3" file="assets/forearm_3.obj" content_type="model/obj" />
+    <mesh name="wrist1_0" file="assets/wrist1_0.obj" content_type="model/obj" />
+    <mesh name="wrist1_1" file="assets/wrist1_1.obj" content_type="model/obj" />
+    <mesh name="wrist1_2" file="assets/wrist1_2.obj" content_type="model/obj" />
+    <mesh name="wrist2_0" file="assets/wrist2_0.obj" content_type="model/obj" />
+    <mesh name="wrist2_1" file="assets/wrist2_1.obj" content_type="model/obj" />
+    <mesh name="wrist3" file="assets/wrist3.obj" content_type="model/obj" />
+    <mesh name="SimpleRodEndEffector_0" file="assets/SimpleRodEndEffector_0.obj" content_type="model/obj" />
+    <mesh name="SimpleRodEndEffector_1" file="assets/SimpleRodEndEffector_1.obj" content_type="model/obj" />
+    <mesh name="pfr_base_0" file="assets/pfr_base_0.obj" content_type="model/obj" />
+    <mesh name="pfr_base_1" file="assets/pfr_base_1.obj" content_type="model/obj" />
+    <mesh name="pfr_base_2" file="assets/pfr_base_2.obj" content_type="model/obj" />
+    <mesh name="pfr_base_3" file="assets/pfr_base_3.obj" content_type="model/obj" />
+    <mesh name="pfr_base_4" file="assets/pfr_base_4.obj" content_type="model/obj" />
+    <mesh name="pfr_base_5" file="assets/pfr_base_5.obj" content_type="model/obj" />
+    <mesh name="pfr_base_6" file="assets/pfr_base_6.obj" content_type="model/obj" />
+    <mesh name="pfr_base_7" file="assets/pfr_base_7.obj" content_type="model/obj" />
+    <mesh name="pfr_base_8" file="assets/pfr_base_8.obj" content_type="model/obj" />
+    <mesh name="pfr_base_9" file="assets/pfr_base_9.obj" content_type="model/obj" />
+    <mesh name="pfr_base_10" file="assets/pfr_base_10.obj" content_type="model/obj" />
+    <mesh name="pfr_base_11" file="assets/pfr_base_11.obj" content_type="model/obj" />
+    <mesh name="pfr_base_12" file="assets/pfr_base_12.obj" content_type="model/obj" />
+    <mesh name="pfr_base_13" file="assets/pfr_base_13.obj" content_type="model/obj" />
+    <mesh name="pfr_base_14" file="assets/pfr_base_14.obj" content_type="model/obj" />
+    <mesh name="pfr_base_15" file="assets/pfr_base_15.obj" content_type="model/obj" />
+    <mesh name="pfr_base_16" file="assets/pfr_base_16.obj" content_type="model/obj" />
+    <mesh name="pfr_base_17" file="assets/pfr_base_17.obj" content_type="model/obj" />
+    <mesh name="pfr_base_18" file="assets/pfr_base_18.obj" content_type="model/obj" />
+    <mesh name="pfr_base_19" file="assets/pfr_base_19.obj" content_type="model/obj" />
+    <mesh name="pfr_base_20" file="assets/pfr_base_20.obj" content_type="model/obj" />
+    <mesh name="pfr_base_21" file="assets/pfr_base_21.obj" content_type="model/obj" />
+    <mesh name="pfr_base_22" file="assets/pfr_base_22.obj" content_type="model/obj" />
+    <mesh name="pfr_base_23" file="assets/pfr_base_23.obj" content_type="model/obj" />
+    <mesh name="pfr_base_24" file="assets/pfr_base_24.obj" content_type="model/obj" />
+    <mesh name="pfr_base_25" file="assets/pfr_base_25.obj" content_type="model/obj" />
+    <mesh name="pfr_base_26" file="assets/pfr_base_26.obj" content_type="model/obj" />
+    <mesh name="pfr_base_27" file="assets/pfr_base_27.obj" content_type="model/obj" />
+    <mesh name="pfr_base_28" file="assets/pfr_base_28.obj" content_type="model/obj" />
+    <mesh name="pfr_base_29" file="assets/pfr_base_29.obj" content_type="model/obj" />
+    <mesh name="pfr_base_30" file="assets/pfr_base_30.obj" content_type="model/obj" />
+    <mesh name="pfr_base_31" file="assets/pfr_base_31.obj" content_type="model/obj" />
+    <mesh name="pfr_base_32" file="assets/pfr_base_32.obj" content_type="model/obj" />
+    <mesh name="pfr_base_33" file="assets/pfr_base_33.obj" content_type="model/obj" />
+    <mesh name="pfr_base_34" file="assets/pfr_base_34.obj" content_type="model/obj" />
+    <mesh name="pfr_base_35" file="assets/pfr_base_35.obj" content_type="model/obj" />
+    <mesh name="pfr_base_36" file="assets/pfr_base_36.obj" content_type="model/obj" />
+    <mesh name="pfr_base_37" file="assets/pfr_base_37.obj" content_type="model/obj" />
+    <mesh name="pfr_base_38" file="assets/pfr_base_38.obj" content_type="model/obj" />
+    <mesh name="pfr_base_39" file="assets/pfr_base_39.obj" content_type="model/obj" />
+    <mesh name="pfr_base_40" file="assets/pfr_base_40.obj" content_type="model/obj" />
+    <mesh name="pfr_base_41" file="assets/pfr_base_41.obj" content_type="model/obj" />
+    <mesh name="pfr_base_42" file="assets/pfr_base_42.obj" content_type="model/obj" />
+    <mesh name="pfr_base_43" file="assets/pfr_base_43.obj" content_type="model/obj" />
+    <mesh name="pfr_base_44" file="assets/pfr_base_44.obj" content_type="model/obj" />
+    <mesh name="pfr_base_45" file="assets/pfr_base_45.obj" content_type="model/obj" />
+    <mesh name="pfr_base_46" file="assets/pfr_base_46.obj" content_type="model/obj" />
+    <mesh name="pfr_base_47" file="assets/pfr_base_47.obj" content_type="model/obj" />
+    <mesh name="pfr_base_48" file="assets/pfr_base_48.obj" content_type="model/obj" />
+    <mesh name="pfr_base_49" file="assets/pfr_base_49.obj" content_type="model/obj" />
+    <mesh name="pfr_base_50" file="assets/pfr_base_50.obj" content_type="model/obj" />
+    <mesh name="pfr_base_51" file="assets/pfr_base_51.obj" content_type="model/obj" />
+    <mesh name="pfr_base_52" file="assets/pfr_base_52.obj" content_type="model/obj" />
+    <mesh name="pfr_base_53" file="assets/pfr_base_53.obj" content_type="model/obj" />
+    <mesh name="pfr_base_54" file="assets/pfr_base_54.obj" content_type="model/obj" />
+    <mesh name="arm_link1_0" file="assets/arm_link1_0.obj" content_type="model/obj" />
+    <mesh name="arm_link1_1" file="assets/arm_link1_1.obj" content_type="model/obj" />
+    <mesh name="arm_link1_2" file="assets/arm_link1_2.obj" content_type="model/obj" />
+    <mesh name="arm_link2_0" file="assets/arm_link2_0.obj" content_type="model/obj" />
+    <mesh name="arm_link2_1" file="assets/arm_link2_1.obj" content_type="model/obj" />
+    <mesh name="arm_link2_2" file="assets/arm_link2_2.obj" content_type="model/obj" />
+    <mesh name="arm_link3_0" file="assets/arm_link3_0.obj" content_type="model/obj" />
+    <mesh name="arm_link3_1" file="assets/arm_link3_1.obj" content_type="model/obj" />
+    <mesh name="arm_link3_2" file="assets/arm_link3_2.obj" content_type="model/obj" />
+    <material name="Material.002" rgba="0.4538652 0.4538652 0.4538652 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="Material.005" rgba="0.0413336605 0.0413336605 0.0413336605 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_0" rgba="0.304448187 0.328116894 0.437909514 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_1" rgba="0.265210003 0.292892992 0.322058111 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="Material.001" rgba="0.0271487199 0.0271487199 0.0271487199 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="Material.003" rgba="0.0730518326 0.0555744693 0.0355741605 1.0" shininess="0.01" specular="0.400000006" />
+    <texture name="UR15_DIFF_8bit_2K" type="2d" file="assets/UR15_DIFF_8bit_2K.png" />
+    <material name="LED_001_COLOR_0" shininess="0.01" specular="0.400000006" texture="UR15_DIFF_8bit_2K" />
+    <material name="Metal_Alu_Brushed_002_COLOR_0" shininess="0.01" specular="0.400000006" texture="UR15_DIFF_8bit_2K" />
+    <material name="Rubber_Black_002_COLOR_0" shininess="0.01" specular="0.400000006" texture="UR15_DIFF_8bit_2K" />
+    <material name="Metal_DarkGray_002_COLOR_0" shininess="0.01" specular="0.400000006" texture="UR15_DIFF_8bit_2K" />
+    <texture name="UR8Long_DIFF_8bit_2K" type="2d" file="assets/UR8Long_DIFF_8bit_2K.png" />
+    <material name="Metal_Alu_Brushed.001" shininess="0.01" specular="0.400000006" texture="UR8Long_DIFF_8bit_2K" />
+    <material name="Metal_DarkGray.001" shininess="0.01" specular="0.400000006" texture="UR8Long_DIFF_8bit_2K" />
+    <material name="Plastic_Blue" shininess="0.01" specular="0.400000006" texture="UR8Long_DIFF_8bit_2K" />
+    <material name="Rubber_Black.001" shininess="0.01" specular="0.400000006" texture="UR8Long_DIFF_8bit_2K" />
+    <material name="Metal_DarkGray_003" shininess="0.01" specular="0.400000006" texture="UR15_DIFF_8bit_2K" />
+    <material name="Plastic_Blue_001" shininess="0.01" specular="0.400000006" texture="UR15_DIFF_8bit_2K" />
+    <material name="Rubber_Black_003" shininess="0.01" specular="0.400000006" texture="UR15_DIFF_8bit_2K" />
+    <material name="mat_10" rgba="0.215860501 0.215860501 0.215860501 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_11" rgba="0.502886474 0.545724511 0.730460823 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_12" rgba="0.0512694493 0.0512694493 0.0512694493 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_13" rgba="0.597201824 0.644479692 0.863157213 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_14" rgba="1 0.520995617 0.212230802 0.5" shininess="0.01" specular="0.400000006" />
+    <material name="mat_15" rgba="0.0409151986 0.0409151986 0.0409151986 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_16" rgba="0.644479692 0.644479692 0.644479692 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_17" rgba="0.0722718537 0.0722718537 0.0722718537 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_18" rgba="0.0307134409 0.0307134409 0.0307134409 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_19" rgba="0.479320198 0.479320198 0.479320198 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_2" rgba="0.376262188 0.341914386 0.304987311 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_20" rgba="0.141263306 0.141263306 0.141263306 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_21" rgba="0.651405573 0.0886555836 0.00604883302 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_22" rgba="1 0.603827417 0.158960804 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_23" rgba="1 0.376262188 0 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_24" rgba="1 0.215860501 0.715693474 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_25" rgba="1 1 0 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_26" rgba="0.215860501 1 1 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_27" rgba="0.198069304 0.198069304 0.198069304 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_28" rgba="0.428690493 0.327778101 0.242281199 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_29" rgba="0.491020888 0.1046165 0.00182116195 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_3" rgba="0.527115226 0.527115226 0.527115226 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_30" rgba="0.838799 0.456411004 0.0307134409 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_31" rgba="0.0129830297 0.0129830297 0.0129830297 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_32" rgba="0.219526201 0.219526201 0.219526201 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_33" rgba="0.198069304 0.723055124 1 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_34" rgba="1 0.564711511 0.0295568407 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_35" rgba="1 0.119538397 0.341914386 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_36" rgba="1 1 0.242281199 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_37" rgba="0.318546802 0.318546802 0.318546802 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_38" rgba="1 1 0.8796224 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_39" rgba="1 0.708375812 0.0722718537 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_4" rgba="0 0 0 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_40" rgba="0.930110872 0.745404184 0.318546802 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_41" rgba="0.132868305 0.132868305 0.132868305 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_42" rgba="0.0528606512 0.0528606512 0.0528606512 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_43" rgba="0.539479494 0.558340371 0.274677306 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_44" rgba="0.177888393 0.097587347 0.0262412205 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_45" rgba="0 0 0.215860501 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_46" rgba="0 0.215860501 0 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_47" rgba="0.0129830297 0.2307401 0.01520852 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_48" rgba="0.730460823 0.1046165 1 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_49" rgba="0.745404184 0.887923121 1 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_5" rgba="0.564711511 0.623960376 0.730460823 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_50" rgba="0.366252601 0.366252601 0.366252601 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_51" rgba="0.274677306 0.644479692 1 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_52" rgba="0.1046165 0.1046165 0.1046165 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_53" rgba="0.791297972 0.462076992 0.1620294 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_54" rgba="0.658374786 0.407240212 0.01520852 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_55" rgba="0.391572505 0.341914386 0.274677306 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_6" rgba="0 0.318546802 1 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_7" rgba="0.434153706 0.434153706 0.434153706 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_8" rgba="0.0802198276 0.0802198276 0.0802198276 1.0" shininess="0.01" specular="0.400000006" />
+    <material name="mat_9" rgba="0.0395462401 0.184475005 0.391572505 1.0" shininess="0.01" specular="0.400000006" />
+  </asset>
+
+  <worldbody>
+    <geom class="visual" pos="0 0 0.74" quat="1 0 0 0" material="mat_1" mesh="UR8LongWorkbench_0" />
+    <geom class="visual" pos="0 0 0.74" quat="1 0 0 0" material="Material.002" mesh="UR8LongWorkbench_1" />
+    <geom class="visual" pos="0 0 0.74" quat="1 0 0 0" material="Material.005" mesh="UR8LongWorkbench_2" />
+    <geom class="visual" pos="0 0 0.74" quat="1 0 0 0" material="mat_0" mesh="UR8LongWorkbench_3" />
+    <geom class="collision" pos="0 0 0.74" quat="1 0 0 0" mesh="UR8LongWorkbench_0" />
+    <geom class="collision" pos="0 0 0.74" quat="1 0 0 0" mesh="UR8LongWorkbench_1" />
+    <geom class="collision" pos="0 0 0.74" quat="1 0 0 0" mesh="UR8LongWorkbench_2" />
+    <geom class="collision" pos="0 0 0.74" quat="1 0 0 0" mesh="UR8LongWorkbench_3" />
+    <geom class="visual" pos="0 0 0.74" quat="-1 0 0 0" material="LED_001_COLOR_0" mesh="base_0" />
+    <geom class="visual" pos="0 0 0.74" quat="-1 0 0 0" material="Rubber_Black_002_COLOR_0" mesh="base_1" />
+    <geom class="visual" pos="0 0 0.74" quat="-1 0 0 0" material="Metal_Alu_Brushed_002_COLOR_0" mesh="base_2" />
+    <geom class="collision" pos="0 0 0.74" quat="-1 0 0 0" mesh="base_0" />
+    <geom class="collision" pos="0 0 0.74" quat="-1 0 0 0" mesh="base_1" />
+    <geom class="collision" pos="0 0 0.74" quat="-1 0 0 0" mesh="base_2" />
+    <geom class="visual" pos="1.22 0 0" quat="1 0 0 0" material="Material.003" mesh="GraniteTable_0" />
+    <geom class="visual" pos="1.22 0 0" quat="1 0 0 0" material="mat_0" mesh="GraniteTable_1" />
+    <geom class="visual" pos="1.22 0 0" quat="1 0 0 0" material="Material.002" mesh="GraniteTable_2" />
+    <geom class="visual" pos="1.22 0 0" quat="1 0 0 0" material="Material.001" mesh="GraniteTable_3" />
+    <geom class="collision" pos="1.22 0 0" quat="1 0 0 0" mesh="GraniteTable_0" />
+    <geom class="collision" pos="1.22 0 0" quat="1 0 0 0" mesh="GraniteTable_1" />
+    <geom class="collision" pos="1.22 0 0" quat="1 0 0 0" mesh="GraniteTable_2" />
+    <geom class="collision" pos="1.22 0 0" quat="1 0 0 0" mesh="GraniteTable_3" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_14" mesh="pfr_base_0" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_55" mesh="pfr_base_1" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_54" mesh="pfr_base_2" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_53" mesh="pfr_base_3" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_52" mesh="pfr_base_4" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_51" mesh="pfr_base_5" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_50" mesh="pfr_base_6" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_49" mesh="pfr_base_7" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_48" mesh="pfr_base_8" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_47" mesh="pfr_base_9" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_45" mesh="pfr_base_10" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_44" mesh="pfr_base_11" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_43" mesh="pfr_base_12" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_42" mesh="pfr_base_13" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_41" mesh="pfr_base_14" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_40" mesh="pfr_base_15" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_39" mesh="pfr_base_16" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_38" mesh="pfr_base_17" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_37" mesh="pfr_base_18" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_36" mesh="pfr_base_19" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_35" mesh="pfr_base_20" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_34" mesh="pfr_base_21" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_33" mesh="pfr_base_22" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_32" mesh="pfr_base_23" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_31" mesh="pfr_base_24" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_30" mesh="pfr_base_25" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_29" mesh="pfr_base_26" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_28" mesh="pfr_base_27" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_27" mesh="pfr_base_28" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_26" mesh="pfr_base_29" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_25" mesh="pfr_base_30" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_24" mesh="pfr_base_31" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_23" mesh="pfr_base_32" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_22" mesh="pfr_base_33" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_21" mesh="pfr_base_34" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_20" mesh="pfr_base_35" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_19" mesh="pfr_base_36" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_18" mesh="pfr_base_37" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_17" mesh="pfr_base_38" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_16" mesh="pfr_base_39" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_15" mesh="pfr_base_40" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_13" mesh="pfr_base_41" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_12" mesh="pfr_base_42" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_11" mesh="pfr_base_43" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_10" mesh="pfr_base_44" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_9" mesh="pfr_base_45" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_5" mesh="pfr_base_46" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_4" mesh="pfr_base_47" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_3" mesh="pfr_base_48" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_2" mesh="pfr_base_49" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_1" mesh="pfr_base_50" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_6" mesh="pfr_base_51" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_7" mesh="pfr_base_52" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_8" mesh="pfr_base_53" />
+    <geom class="visual" pos="1.22 -1 0.7" quat="1 0 0 0" material="mat_0" mesh="pfr_base_54" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_0" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_1" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_2" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_3" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_4" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_5" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_6" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_7" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_8" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_9" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_10" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_11" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_12" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_13" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_14" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_15" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_16" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_17" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_18" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_19" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_20" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_21" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_22" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_23" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_24" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_25" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_26" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_27" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_28" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_29" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_30" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_31" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_32" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_33" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_34" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_35" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_36" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_37" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_38" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_39" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_40" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_41" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_42" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_43" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_44" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_45" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_46" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_47" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_48" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_49" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_50" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_51" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_52" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_53" />
+    <geom class="collision" pos="1.22 -1 0.7" quat="1 0 0 0" mesh="pfr_base_54" />
+    <body name="ur_main/shoulder_link" pos="0 0 0.9586" quat="0 0 0 1">
+      <inertial pos="2.4e-05 -0.025304 -0.033309" quat="0.695667 0.163117 -0.158899 0.681316" diaginertia="0.0520589 0.0513337 0.0299064" mass="9.9883" />
+      <joint name="ur_main/shoulder_pan_joint" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-433 433" range="-6.28319 6.28319" />
+      <geom class="visual" pos="0 0 0" quat="0 0 0 1" material="Rubber_Black_002_COLOR_0" mesh="shoulder_0" />
+      <geom class="visual" pos="0 0 0" quat="0 0 0 1" material="Metal_DarkGray_002_COLOR_0" mesh="shoulder_1" />
+      <geom class="collision" pos="0 0 0" quat="0 0 0 1" mesh="shoulder_0" />
+      <geom class="collision" pos="0 0 0" quat="0 0 0 1" mesh="shoulder_1" />
+      <body name="ur_main/upper_arm_link" quat="0.707107 0.707107 0 0">
+        <inertial pos="-0.333471 -7.4e-05 0.19542" quat="0.506621 0.493391 0.495006 0.504845" diaginertia="2.44012 2.43401 0.0554434" mass="17.0738" />
+        <joint name="ur_main/shoulder_lift_joint" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-433 433" range="-6.28319 6.28319" />
+        <geom class="visual" pos="0 0 0.109" quat="0.5 0.5 -0.5 -0.5" material="Rubber_Black.001" mesh="upperarm_0" />
+        <geom class="visual" pos="0 0 0.109" quat="0.5 0.5 -0.5 -0.5" material="Metal_Alu_Brushed.001" mesh="upperarm_1" />
+        <geom class="visual" pos="0 0 0.109" quat="0.5 0.5 -0.5 -0.5" material="Metal_DarkGray.001" mesh="upperarm_2" />
+        <geom class="visual" pos="0 0 0.109" quat="0.5 0.5 -0.5 -0.5" material="Plastic_Blue" mesh="upperarm_3" />
+        <geom class="collision" pos="0 0 0.109" quat="0.5 0.5 -0.5 -0.5" mesh="upperarm_0" />
+        <geom class="collision" pos="0 0 0.109" quat="0.5 0.5 -0.5 -0.5" mesh="upperarm_1" />
+        <geom class="collision" pos="0 0 0.109" quat="0.5 0.5 -0.5 -0.5" mesh="upperarm_2" />
+        <geom class="collision" pos="0 0 0.109" quat="0.5 0.5 -0.5 -0.5" mesh="upperarm_3" />
+        <body name="ur_main/forearm_link" pos="-0.8989 0 0">
+          <inertial pos="-0.298798 5.8e-05 0.065663" quat="0.491605 0.508309 0.507913 0.491905" diaginertia="0.633274 0.626536 0.0215007" mass="7.6393" />
+          <joint name="ur_main/elbow_joint" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-204 204" range="-3.14159 3.14159" />
+          <geom class="visual" pos="0 0 0.134242" quat="0.5 0.5 -0.5 -0.5" material="Rubber_Black.001" mesh="forearm_0" />
+          <geom class="visual" pos="0 0 0.134242" quat="0.5 0.5 -0.5 -0.5" material="Metal_Alu_Brushed.001" mesh="forearm_1" />
+          <geom class="visual" pos="0 0 0.134242" quat="0.5 0.5 -0.5 -0.5" material="Metal_DarkGray.001" mesh="forearm_2" />
+          <geom class="visual" pos="0 0 0.134242" quat="0.5 0.5 -0.5 -0.5" material="Plastic_Blue" mesh="forearm_3" />
+          <geom class="collision" pos="0 0 0.134242" quat="0.5 0.5 -0.5 -0.5" mesh="forearm_0" />
+          <geom class="collision" pos="0 0 0.134242" quat="0.5 0.5 -0.5 -0.5" mesh="forearm_1" />
+          <geom class="collision" pos="0 0 0.134242" quat="0.5 0.5 -0.5 -0.5" mesh="forearm_2" />
+          <geom class="collision" pos="0 0 0.134242" quat="0.5 0.5 -0.5 -0.5" mesh="forearm_3" />
+          <body name="ur_main/wrist_1_link" pos="-0.7149 0 0.1824">
+            <inertial pos="2.5e-05 -0.016413 -0.019695" quat="0.833332 0.5518 -0.0145415 0.0293715" diaginertia="0.00433968 0.00421107 0.00224825" mass="2.089" />
+            <joint name="ur_main/wrist_1_joint" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-70 70" range="-6.28319 6.28319" />
+            <geom class="visual" pos="0 0 -0.0502" quat="0.707107 0.707107 0 0" material="Plastic_Blue_001" mesh="wrist1_0" />
+            <geom class="visual" pos="0 0 -0.0502" quat="0.707107 0.707107 0 0" material="Rubber_Black_003" mesh="wrist1_1" />
+            <geom class="visual" pos="0 0 -0.0502" quat="0.707107 0.707107 0 0" material="Metal_DarkGray_003" mesh="wrist1_2" />
+            <geom class="collision" pos="0 0 -0.0502" quat="0.707107 0.707107 0 0" mesh="wrist1_0" />
+            <geom class="collision" pos="0 0 -0.0502" quat="0.707107 0.707107 0 0" mesh="wrist1_1" />
+            <geom class="collision" pos="0 0 -0.0502" quat="0.707107 0.707107 0 0" mesh="wrist1_2" />
+            <body name="ur_main/wrist_2_link" pos="0 -0.1361 -2.79146e-11" quat="0.707107 0.707107 0 0">
+              <inertial pos="2.5e-05 0.015886 -0.01996" quat="0.548572 0.831821 0.0724532 -0.0435051" diaginertia="0.00428972 0.00423268 0.0022586" mass="2.0869" />
+              <joint name="ur_main/wrist_2_joint" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-70 70" range="-6.28319 6.28319" />
+              <geom class="visual" pos="0 0 -0.064" quat="1 0 0 0" material="Rubber_Black_002_COLOR_0" mesh="wrist2_0" />
+              <geom class="visual" pos="0 0 -0.064" quat="1 0 0 0" material="Metal_DarkGray_002_COLOR_0" mesh="wrist2_1" />
+              <geom class="collision" pos="0 0 -0.064" quat="1 0 0 0" mesh="wrist2_0" />
+              <geom class="collision" pos="0 0 -0.064" quat="1 0 0 0" mesh="wrist2_1" />
+              <body name="ur_main/wrist_3_link" pos="0 0.1434 -2.94118e-11" quat="0.707107 -0.707107 0 0">
+                <inertial pos="-1.08771e-05 -6.66767e-05 0.00999254" quat="0.950776 -0.000991184 -0.000659664 -0.309877" diaginertia="0.0150691 0.0150627 0.00129956" mass="1.79162" />
+                <joint name="ur_main/wrist_3_joint" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-70 70" range="-6.28319 6.28319" />
+                <geom class="visual" pos="0 0 -0.0715" quat="0.707107 0.707107 0 0" material="Metal_Alu_Brushed_002_COLOR_0" mesh="wrist3" />
+                <geom class="collision" pos="0 0 -0.0715" quat="0.707107 0.707107 0 0" mesh="wrist3" />
+                <geom class="visual" pos="0 0 0" quat="0.707107 0 0 -0.707107" material="Material.001" mesh="SimpleRodEndEffector_0" />
+                <geom class="visual" pos="0 0 0" quat="0.707107 0 0 -0.707107" material="mat_0" mesh="SimpleRodEndEffector_1" />
+                <geom class="collision" pos="0 0 0" quat="0.707107 0 0 -0.707107" mesh="SimpleRodEndEffector_0" />
+                <geom class="collision" pos="0 0 0" quat="0.707107 0 0 -0.707107" mesh="SimpleRodEndEffector_1" />
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="pfr_c_arm_link1" pos="1.36337 -0.856637 1.06" quat="0.923898 0 0 0.382638">
+      <joint name="pfr_c_arm_joint1" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-10 10" range="-1.5708 1.5708" />
+      <geom class="visual" pos="0 0 0" quat="1 0 0 0" material="mat_1" mesh="arm_link1_0" />
+      <geom class="visual" pos="0 0 0" quat="1 0 0 0" material="mat_0" mesh="arm_link1_1" />
+      <geom class="visual" pos="0 0 0" quat="1 0 0 0" material="mat_2" mesh="arm_link1_2" />
+      <geom class="collision" pos="0 0 0" quat="1 0 0 0" mesh="arm_link1_0" />
+      <geom class="collision" pos="0 0 0" quat="1 0 0 0" mesh="arm_link1_1" />
+      <geom class="collision" pos="0 0 0" quat="1 0 0 0" mesh="arm_link1_2" />
+      <body name="pfr_c_arm_link2" pos="0.3 0 0">
+        <joint name="pfr_c_arm_joint2" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-10 10" range="-1.5708 1.5708" />
+        <geom class="visual" pos="0 0 0" quat="1 0 0 0" material="mat_1" mesh="arm_link2_0" />
+        <geom class="visual" pos="0 0 0" quat="1 0 0 0" material="mat_0" mesh="arm_link2_1" />
+        <geom class="visual" pos="0 0 0" quat="1 0 0 0" material="mat_2" mesh="arm_link2_2" />
+        <geom class="collision" pos="0 0 0" quat="1 0 0 0" mesh="arm_link2_0" />
+        <geom class="collision" pos="0 0 0" quat="1 0 0 0" mesh="arm_link2_1" />
+        <geom class="collision" pos="0 0 0" quat="1 0 0 0" mesh="arm_link2_2" />
+        <body name="pfr_c_arm_link3" pos="0.3 0 0">
+          <joint name="pfr_c_arm_joint3" pos="0 0 0" axis="0 0 1" actuatorfrcrange="-10 10" range="-1.5708 1.5708" />
+          <geom class="visual" pos="0 0 0" quat="1 0 0 0" material="mat_1" mesh="arm_link3_0" />
+          <geom class="visual" pos="0 0 0" quat="1 0 0 0" material="mat_3" mesh="arm_link3_1" />
+          <geom class="visual" pos="0 0 0" quat="1 0 0 0" material="mat_2" mesh="arm_link3_2" />
+          <geom class="collision" pos="0 0 0" quat="1 0 0 0" mesh="arm_link3_0" />
+          <geom class="collision" pos="0 0 0" quat="1 0 0 0" mesh="arm_link3_1" />
+          <geom class="collision" pos="0 0 0" quat="1 0 0 0" mesh="arm_link3_2" />
+        </body>
+      </body>
+    </body>
+    <light name="overview_light" pos="0 -3 5" diffuse="1 1 1" dir="0 1 -1" specular="0.3 0.3 0.3" />
+    <camera name="overview" pos="3 -4 3" xyaxes="1 0.75 0 -0.45 0.6 0.66" />
+    <geom name="floor" type="plane" pos="0 0 0" size="5 5 0.1" rgba="0.8 0.8 0.8 1" />
+  </worldbody>
+
+  <actuator>
+    <motor name="ur_main_shoulder_pan_joint_motor" joint="ur_main/shoulder_pan_joint" gear="1" ctrllimited="true" ctrlrange="-433 433" />
+    <motor name="ur_main_shoulder_lift_joint_motor" joint="ur_main/shoulder_lift_joint" gear="1" ctrllimited="true" ctrlrange="-433 433" />
+    <motor name="ur_main_elbow_joint_motor" joint="ur_main/elbow_joint" gear="1" ctrllimited="true" ctrlrange="-204 204" />
+    <motor name="ur_main_wrist_1_joint_motor" joint="ur_main/wrist_1_joint" gear="1" ctrllimited="true" ctrlrange="-70 70" />
+    <motor name="ur_main_wrist_2_joint_motor" joint="ur_main/wrist_2_joint" gear="1" ctrllimited="true" ctrlrange="-70 70" />
+    <motor name="ur_main_wrist_3_joint_motor" joint="ur_main/wrist_3_joint" gear="1" ctrllimited="true" ctrlrange="-70 70" />
+    <motor name="pfr_c_arm_joint1_motor" joint="pfr_c_arm_joint1" gear="1" ctrllimited="true" ctrlrange="-10 10" />
+    <motor name="pfr_c_arm_joint2_motor" joint="pfr_c_arm_joint2" gear="1" ctrllimited="true" ctrlrange="-10 10" />
+    <motor name="pfr_c_arm_joint3_motor" joint="pfr_c_arm_joint3" gear="1" ctrllimited="true" ctrlrange="-10 10" />
+  </actuator>
+</mujoco>

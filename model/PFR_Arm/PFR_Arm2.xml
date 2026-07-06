@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco model="PFR_Arm2">
+  <!-- Generated from PFR_Arm2.urdf. Lengths are in metres and angles in radians. -->
+  <compiler angle="radian" meshdir="meshes" autolimits="true"/>
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0.1 0.1 0.1"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="135" elevation="-20"/>
+  </visual>
+
+  <default>
+    <joint type="hinge" axis="0 0 1" limited="false" damping="0.02" armature="0.001"/>
+    <default class="visual">
+      <geom type="mesh" material="arm_blue" group="2" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom type="mesh" group="3" rgba="0 0 0 0" friction="0.8 0.1 0.1"/>
+    </default>
+    <motor ctrllimited="false"/>
+  </default>
+
+  <asset>
+    <material name="arm_blue" rgba="0.7921569 0.8196078 0.9333333 1"/>
+    <material name="floor" rgba="0.22 0.24 0.28 1"/>
+
+    <mesh name="base_link_mesh" file="base_link.STL"/>
+    <mesh name="Joint1_R_mesh" file="Joint1_R.STL"/>
+    <mesh name="Joint2_R_mesh" file="Joint2_R.STL"/>
+    <mesh name="Joint3_R_mesh" file="Joint3_R.STL"/>
+    <mesh name="Joint1_L_mesh" file="Joint1_L.STL"/>
+    <mesh name="Joint2_L_mesh" file="Joint2_L.STL"/>
+    <mesh name="Joint3_L_mesh" file="Joint3_L.STL"/>
+  </asset>
+
+  <worldbody>
+    <light name="top" pos="0 0 2" dir="0 0 -1" diffuse="0.8 0.8 0.8"/>
+    <geom name="floor" type="plane" size="1 1 0.05" material="floor"/>
+    <camera name="overview" pos="1.5 -1.5 1.1" xyaxes="0.707107 0.707107 0 -0.286039 0.286039 0.91466"/>
+
+    <!-- The URDF has no base joint, so base_link is fixed to the world. -->
+    <body name="base_link">
+      <inertial pos="2.67023784161503e-17 1.38748955932851e-17 0.185886916570362"
+                mass="37.0077126301145"
+                fullinertia="0.724473253004157 0.724407746640749 0.602836393608002 -1.86300210027573e-13 -5.02319701611592e-18 3.75870870342342e-21"/>
+      <geom name="base_link_visual" class="visual" mesh="base_link_mesh"/>
+      <geom name="base_link_collision" class="collision" mesh="base_link_mesh"/>
+
+      <joint name="chaser_x"   type="slide" axis="1 0 0" damping="0" armature="0" limited="false"/>
+      <joint name="chaser_y"   type="slide" axis="0 1 0" damping="0" armature="0" limited="false"/>
+      <joint name="chaser_yaw" type="hinge" axis="0 0 1" damping="0" armature="0" limited="false"/>
+
+      <body name="Joint1_R" pos="0 -0.18175 0.174">
+        <inertial pos="-9.31857326154312e-11 -0.195378541069816 0.00672546665364099"
+                  mass="0.410933607210843"
+                  fullinertia="0.00175299289156333 0.000195601668420019 0.00169629776467482 -5.89177135842882e-12 1.3984615394458e-12 1.88142895656864e-05"/>
+        <joint name="Joint1_R" limited="true" range="-1.57079632679 1.57079632679"/>
+        <geom name="Joint1_R_visual" class="visual" mesh="Joint1_R_mesh"/>
+        <geom name="Joint1_R_collision" class="collision" mesh="Joint1_R_mesh"/>
+
+        <body name="Joint2_R" pos="0 -0.3 0.00950000000000006">
+          <inertial pos="-8.81578836366647e-10 -0.205753132187302 0.00699863753540647"
+                    mass="0.374093067317941"
+                    fullinertia="0.00161509478193257 0.000190449958941573 0.00154274686402644 3.84970577116986e-11 9.48021605813476e-12 -4.24797754234991e-06"/>
+          <joint name="Joint2_R" limited="true" range="-2.61799387799 2.61799387799"/>
+          <geom name="Joint2_R_visual" class="visual" mesh="Joint2_R_mesh"/>
+          <geom name="Joint2_R_collision" class="collision" mesh="Joint2_R_mesh"/>
+
+          <body name="Joint3_R" pos="0 -0.3 0.00949999999999965">
+            <inertial pos="-7.37750807914269e-05 -0.0311442464401741 0.00549599281689406"
+                      mass="0.0882871164231278"
+                      fullinertia="3.66676493897971e-05 4.02110494136869e-05 1.64829163884356e-05 -5.00700285155369e-08 1.10564509395472e-07 -1.3169841303705e-06"/>
+            <joint name="Joint3_R" limited="true" range="-1.57079632679 1.57079632679"/>
+            <geom name="Joint3_R_visual" class="visual" mesh="Joint3_R_mesh"/>
+            <geom name="Joint3_R_collision" class="collision" mesh="Joint3_R_mesh"/>
+            <site name="ee_site_R" type="sphere" pos="0 -0.0541 0.0045" size="0.005" rgba="1 0.2 0.1 1"/>
+          </body>
+        </body>
+      </body>
+
+      <body name="Joint1_L" pos="0 0.18175 0.174">
+        <inertial pos="9.31857192870736e-11 0.195378541069816 0.00672546665364096"
+                  mass="0.410933607210843"
+                  fullinertia="0.00175299289156333 0.000195601668420019 0.00169629776467482 -5.89177121781119e-12 -1.39846151657399e-12 -1.88142895656863e-05"/>
+        <joint name="Joint1_L" limited="true" range="-1.57079632679 1.57079632679"/>
+        <geom name="Joint1_L_visual" class="visual" mesh="Joint1_L_mesh"/>
+        <geom name="Joint1_L_collision" class="collision" mesh="Joint1_L_mesh"/>
+
+        <body name="Joint2_L" pos="0 0.3 0.00950000000000006">
+          <inertial pos="8.81578823250344e-10 0.205753132187302 0.00699863753540644"
+                    mass="0.374093067317941"
+                    fullinertia="0.00161509478193257 0.000190449958941573 0.00154274686402644 3.84970576996398e-11 -9.48021602314208e-12 4.2479775423505e-06"/>
+          <joint name="Joint2_L" limited="true" range="-2.61799387799 2.61799387799"/>
+          <geom name="Joint2_L_visual" class="visual" mesh="Joint2_L_mesh"/>
+          <geom name="Joint2_L_collision" class="collision" mesh="Joint2_L_mesh"/>
+
+          <body name="Joint3_L" pos="0 0.3 0.00949999999999965">
+            <inertial pos="7.37750807914593e-05 0.0311442464401742 0.00549599281689406"
+                      mass="0.0882871164231278"
+                      fullinertia="3.66676493897971e-05 4.02110494136869e-05 1.64829163884356e-05 -5.00700285155311e-08 -1.1056450939546e-07 1.31698413037051e-06"/>
+            <joint name="Joint3_L" limited="true" range="-1.57079632679 1.57079632679"/>
+            <geom name="Joint3_L_visual" class="visual" mesh="Joint3_L_mesh"/>
+            <geom name="Joint3_L_collision" class="collision" mesh="Joint3_L_mesh"/>
+            <site name="ee_site_L" type="sphere" pos="0 0.0541 0.0045" size="0.005" rgba="1 0.2 0.1 1"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- Adjacent CAD meshes overlap around their revolute bearings by design. -->
+  <contact>
+    <exclude body1="base_link" body2="Joint1_R"/>
+    <exclude body1="Joint1_R" body2="Joint2_R"/>
+    <exclude body1="Joint2_R" body2="Joint3_R"/>
+    <exclude body1="base_link" body2="Joint1_L"/>
+    <exclude body1="Joint1_L" body2="Joint2_L"/>
+    <exclude body1="Joint2_L" body2="Joint3_L"/>
+  </contact>
+
+  <actuator>
+    <!-- Torque motors: ctrl is joint torque in N m because gear defaults to 1. -->
+    <motor name="Joint1_R_motor" joint="Joint1_R"/>
+    <motor name="Joint2_R_motor" joint="Joint2_R"/>
+    <motor name="Joint3_R_motor" joint="Joint3_R"/>
+    <motor name="Joint1_L_motor" joint="Joint1_L"/>
+    <motor name="Joint2_L_motor" joint="Joint2_L"/>
+    <motor name="Joint3_L_motor" joint="Joint3_L"/>
+  </actuator>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0" ctrl="0 0 0 0 0 0"/>
+  </keyframe>
+</mujoco>

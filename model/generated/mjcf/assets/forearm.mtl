@@ -1,0 +1,43 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v5.2.0)
+
+newmtl Metal_Alu_Brushed.001
+Kd 1 1 1
+Ka 0.100000001 0.100000001 0.100000001
+Ks 0.400000006 0.400000006 0.400000006
+Ke 0 0 0
+Ni 1.5
+Ns 10
+illum 2
+map_Kd UR8Long_DIFF_8bit_2K.jpg
+
+newmtl Metal_DarkGray.001
+Kd 1 1 1
+Ka 0.100000001 0.100000001 0.100000001
+Ks 0.400000006 0.400000006 0.400000006
+Ke 0 0 0
+Ni 1.5
+Ns 10
+illum 2
+map_Kd UR8Long_DIFF_8bit_2K.jpg
+
+newmtl Plastic_Blue
+Kd 1 1 1
+Ka 0.100000001 0.100000001 0.100000001
+Ks 0.400000006 0.400000006 0.400000006
+Ke 0 0 0
+Ni 1.5
+Ns 10
+illum 2
+map_Kd UR8Long_DIFF_8bit_2K.jpg
+
+newmtl Rubber_Black.001
+Kd 1 1 1
+Ka 0.100000001 0.100000001 0.100000001
+Ks 0.400000006 0.400000006 0.400000006
+Ke 0 0 0
+Ni 1.5
+Ns 10
+illum 2
+map_Kd UR8Long_DIFF_8bit_2K.jpg
+
