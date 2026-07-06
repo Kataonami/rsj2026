@@ -16,13 +16,16 @@ public:
   ~PfrLowLevelControl() override;
 
 private:
+  void basePoseCallback(const geometry_msgs::msg::PoseStamped & pose);
   void rightJointStateCallback(const sensor_msgs::msg::JointState & joint_state);
   void rightPoseReferenceCallback(const geometry_msgs::msg::PoseStamped & pose);
   void rightTwistReferenceCallback(const geometry_msgs::msg::TwistStamped & twist);
   void controlTimerCallback();
   void publishZeroVelocity();
 
+  rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr base_velocity_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr joint_velocity_pub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr base_pose_sub_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr right_joint_state_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr right_pose_ref_sub_;
   rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr right_twist_ref_sub_;

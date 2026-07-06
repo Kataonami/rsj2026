@@ -5,6 +5,19 @@
 <robot
   name="PFR_Arm2">
   <link
+    name="world" />
+  <joint
+    name="world_to_base"
+    type="floating">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="world" />
+    <child
+      link="base_link" />
+  </joint>
+  <link
     name="base_link">
   <inertial>
     <origin

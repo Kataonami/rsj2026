@@ -20,6 +20,8 @@ __pycache__/
 
 # Virtual environments
 .venv/
+.venv-*/
+.pinocchio-*/
 venv/
 env/
 

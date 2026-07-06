@@ -26,6 +26,9 @@ constexpr std::array<const char *, 3> kInputJointNames = {
   "joint1_R", "joint2_R", "joint3_R"};
 constexpr std::array<const char *, 3> kModelJointNames = {
   "joint1_R", "joint2_R", "joint3_R"};
+constexpr std::size_t kPlanarBaseDof = 3;
+constexpr std::size_t kRightArmDof = 3;
+constexpr std::size_t kGeneralizedDof = kPlanarBaseDof + kRightArmDof;
 
 double wrapAngle(double angle)
 {
@@ -43,6 +46,21 @@ double quaternionYaw(const geometry_msgs::msg::Quaternion & quaternion_msg)
   quaternion.normalize();
   const Eigen::Matrix3d rotation = quaternion.toRotationMatrix();
   return std::atan2(rotation(1, 0), rotation(0, 0));
+}
+
+void setPlanarFloatingBaseConfiguration(
+  const geometry_msgs::msg::Pose & base_pose,
+  Eigen::VectorXd & q,
+  Eigen::Index base_q_index)
+{
+  const double yaw = quaternionYaw(base_pose.orientation);
+  q[base_q_index + 0] = base_pose.position.x;
+  q[base_q_index + 1] = base_pose.position.y;
+  q[base_q_index + 2] = 0.0;
+  q[base_q_index + 3] = 0.0;
+  q[base_q_index + 4] = 0.0;
+  q[base_q_index + 5] = std::sin(0.5 * yaw);
+  q[base_q_index + 6] = std::cos(0.5 * yaw);
 }
 
 bool solvePlanarPositionIk(
@@ -125,6 +143,8 @@ struct PfrLowLevelControl::ControllerState
   pinocchio::Model model;
   std::unique_ptr<pinocchio::Data> data;
   Eigen::VectorXd q;
+  Eigen::Index base_q_index{-1};
+  std::array<Eigen::Index, 3> base_v_indices{};
   std::array<Eigen::Index, 3> q_indices{};
   std::array<Eigen::Index, 3> v_indices{};
   std::array<pinocchio::JointIndex, 3> joint_ids{};
@@ -141,9 +161,11 @@ struct PfrLowLevelControl::ControllerState
 
   geometry_msgs::msg::PoseStamped pose_reference;
   geometry_msgs::msg::TwistStamped twist_reference;
+  rclcpp::Time last_base_pose_time{0, 0, RCL_ROS_TIME};
   rclcpp::Time last_joint_state_time{0, 0, RCL_ROS_TIME};
   rclcpp::Time last_pose_reference_time{0, 0, RCL_ROS_TIME};
   rclcpp::Time last_twist_reference_time{0, 0, RCL_ROS_TIME};
+  bool base_pose_received{false};
   bool pose_reference_received{false};
   bool twist_reference_received{false};
   bool command_active{false};
@@ -152,10 +174,13 @@ struct PfrLowLevelControl::ControllerState
   double joint_position_gain{2.0};
   double task_space_gain{2.0};
   double damping{0.05};
+  double max_base_linear_velocity{0.5};
+  double max_base_yaw_velocity{1.0};
   double max_joint_velocity{2.0};
   double command_timeout_s{0.25};
   double control_rate_hz{50.0};
-  std::string base_frame_id{"base_link"};
+  std::string base_frame_id{"world"};
+  std::string base_pose_topic{"/optitrack/base_pose"};
 };
 
 PfrLowLevelControl::PfrLowLevelControl()
@@ -169,8 +194,12 @@ PfrLowLevelControl::PfrLowLevelControl()
     this->declare_parameter<std::string>("urdf_path", default_urdf_path);
   const auto ee_frame =
     this->declare_parameter<std::string>("right_ee_frame", "joint3_R");
+  const auto base_joint =
+    this->declare_parameter<std::string>("base_joint", "world_to_base");
   controller_->base_frame_id =
-    this->declare_parameter<std::string>("base_frame_id", "base_link");
+    this->declare_parameter<std::string>("base_frame_id", "world");
+  controller_->base_pose_topic =
+    this->declare_parameter<std::string>("base_pose_topic", "/optitrack/base_pose");
   controller_->control_mode =
     this->declare_parameter<std::string>("control_mode", "generalized_jacobian");
   controller_->joint_position_gain =
@@ -179,6 +208,10 @@ PfrLowLevelControl::PfrLowLevelControl()
     this->declare_parameter<double>("task_space_gain", 2.0);
   controller_->damping =
     this->declare_parameter<double>("damping", 0.05);
+  controller_->max_base_linear_velocity =
+    this->declare_parameter<double>("max_base_linear_velocity", 0.5);
+  controller_->max_base_yaw_velocity =
+    this->declare_parameter<double>("max_base_yaw_velocity", 1.0);
   controller_->max_joint_velocity =
     this->declare_parameter<double>("max_joint_velocity", 2.0);
   controller_->command_timeout_s =
@@ -194,7 +227,8 @@ PfrLowLevelControl::PfrLowLevelControl()
   }
   if (controller_->joint_position_gain <= 0.0 ||
     controller_->task_space_gain <= 0.0 ||
-    controller_->damping <= 0.0 || controller_->max_joint_velocity <= 0.0 ||
+    controller_->damping <= 0.0 || controller_->max_base_linear_velocity <= 0.0 ||
+    controller_->max_base_yaw_velocity <= 0.0 || controller_->max_joint_velocity <= 0.0 ||
     controller_->command_timeout_s <= 0.0 || controller_->control_rate_hz <= 0.0)
   {
     throw std::invalid_argument("Low-level controller parameters must be positive.");
@@ -204,6 +238,20 @@ PfrLowLevelControl::PfrLowLevelControl()
     pinocchio::urdf::buildModel(urdf_path, controller_->model);
     controller_->data = std::make_unique<pinocchio::Data>(controller_->model);
     controller_->q = pinocchio::neutral(controller_->model);
+
+    if (!controller_->model.existJointName(base_joint)) {
+      throw std::runtime_error("Floating base joint not found: " + base_joint);
+    }
+    const auto base_joint_id = controller_->model.getJointId(base_joint);
+    const auto & base_joint_model = controller_->model.joints[base_joint_id];
+    if (base_joint_model.nq() < 7 || base_joint_model.nv() < 6) {
+      throw std::runtime_error("Expected a floating base joint with nq>=7 and nv>=6: " + base_joint);
+    }
+    controller_->base_q_index = base_joint_model.idx_q();
+    controller_->base_v_indices = {
+      base_joint_model.idx_v(),
+      base_joint_model.idx_v() + 1,
+      base_joint_model.idx_v() + 5};
 
     for (std::size_t index = 0; index < kModelJointNames.size(); ++index) {
       const std::string joint_name = kModelJointNames[index];
@@ -276,6 +324,15 @@ PfrLowLevelControl::PfrLowLevelControl()
   joint_velocity_pub_ =
     this->create_publisher<std_msgs::msg::Float64MultiArray>(
     "/dxl_velocity_controller/commands", 10);
+  base_velocity_pub_ =
+    this->create_publisher<std_msgs::msg::Float64MultiArray>(
+    "/base_velocity_cmd", 10);
+  base_pose_sub_ =
+    this->create_subscription<geometry_msgs::msg::PoseStamped>(
+    controller_->base_pose_topic, 10,
+    std::bind(
+      &PfrLowLevelControl::basePoseCallback, this,
+      std::placeholders::_1));
   right_joint_state_sub_ =
     this->create_subscription<sensor_msgs::msg::JointState>(
     "/pfr_state_estimator/right/current_joint_states", 10,
@@ -303,11 +360,27 @@ PfrLowLevelControl::PfrLowLevelControl()
 
   RCLCPP_INFO(
     this->get_logger(),
-    "Right-arm controller started in '%s' mode with Pinocchio %s at %.1f Hz.",
-    controller_->control_mode.c_str(), PINOCCHIO_VERSION, controller_->control_rate_hz);
+    "Right-arm controller started in '%s' mode with Pinocchio %s at %.1f Hz; base pose topic: '%s'.",
+    controller_->control_mode.c_str(), PINOCCHIO_VERSION, controller_->control_rate_hz,
+    controller_->base_pose_topic.c_str());
 }
 
 PfrLowLevelControl::~PfrLowLevelControl() = default;
+
+void PfrLowLevelControl::basePoseCallback(const geometry_msgs::msg::PoseStamped & pose)
+{
+  if (!pose.header.frame_id.empty() && pose.header.frame_id != controller_->base_frame_id) {
+    RCLCPP_WARN_THROTTLE(
+      this->get_logger(), *this->get_clock(), 2000,
+      "Base pose frame '%s' does not match expected frame '%s'.",
+      pose.header.frame_id.c_str(), controller_->base_frame_id.c_str());
+  }
+
+  setPlanarFloatingBaseConfiguration(
+    pose.pose, controller_->q, controller_->base_q_index);
+  controller_->base_pose_received = true;
+  controller_->last_base_pose_time = this->now();
+}
 
 void PfrLowLevelControl::rightJointStateCallback(
   const sensor_msgs::msg::JointState & joint_state)
@@ -352,7 +425,8 @@ void PfrLowLevelControl::controlTimerCallback()
   const bool all_joints_received = std::all_of(
     controller_->joint_received.begin(), controller_->joint_received.end(),
     [](bool received) {return received;});
-  if (!all_joints_received || !controller_->pose_reference_received ||
+  if (!controller_->base_pose_received || !all_joints_received ||
+    !controller_->pose_reference_received ||
     !controller_->twist_reference_received)
   {
     return;
@@ -360,6 +434,7 @@ void PfrLowLevelControl::controlTimerCallback()
 
   const rclcpp::Time now = this->now();
   const bool input_is_stale =
+    (now - controller_->last_base_pose_time).seconds() > controller_->command_timeout_s ||
     (now - controller_->last_joint_state_time).seconds() > controller_->command_timeout_s ||
     (now - controller_->last_pose_reference_time).seconds() > controller_->command_timeout_s ||
     (now - controller_->last_twist_reference_time).seconds() > controller_->command_timeout_s;
@@ -395,13 +470,22 @@ void PfrLowLevelControl::controlTimerCallback()
     controller_->ee_frame_id, pinocchio::LOCAL_WORLD_ALIGNED,
     full_jacobian);
 
-  Eigen::Matrix3d task_jacobian;
+  Eigen::Matrix<double, 3, kGeneralizedDof> generalized_task_jacobian;
+  for (std::size_t index = 0; index < controller_->base_v_indices.size(); ++index) {
+    const Eigen::Index column = controller_->base_v_indices[index];
+    generalized_task_jacobian(0, index) = full_jacobian(0, column);
+    generalized_task_jacobian(1, index) = full_jacobian(1, column);
+    generalized_task_jacobian(2, index) = full_jacobian(5, column);
+  }
   for (std::size_t index = 0; index < controller_->v_indices.size(); ++index) {
     const Eigen::Index column = controller_->v_indices[index];
-    task_jacobian(0, index) = full_jacobian(0, column);
-    task_jacobian(1, index) = full_jacobian(1, column);
-    task_jacobian(2, index) = full_jacobian(5, column);
+    const std::size_t generalized_index = kPlanarBaseDof + index;
+    generalized_task_jacobian(0, generalized_index) = full_jacobian(0, column);
+    generalized_task_jacobian(1, generalized_index) = full_jacobian(1, column);
+    generalized_task_jacobian(2, generalized_index) = full_jacobian(5, column);
   }
+  const Eigen::Matrix3d arm_task_jacobian =
+    generalized_task_jacobian.block<3, kRightArmDof>(0, kPlanarBaseDof);
 
   Eigen::Vector3d desired_task_velocity;
   desired_task_velocity <<
@@ -409,10 +493,7 @@ void PfrLowLevelControl::controlTimerCallback()
     controller_->twist_reference.twist.linear.y,
     controller_->twist_reference.twist.angular.z;
 
-  const Eigen::Matrix3d damped_task_matrix =
-    task_jacobian * task_jacobian.transpose() +
-    std::pow(controller_->damping, 2) * Eigen::Matrix3d::Identity();
-
+  Eigen::Vector3d base_velocity = Eigen::Vector3d::Zero();
   Eigen::Vector3d joint_velocity;
   if (controller_->control_mode == "generalized_jacobian") {
     const auto & current_ee_pose =
@@ -427,13 +508,16 @@ void PfrLowLevelControl::controlTimerCallback()
       controller_->pose_reference.pose.position.y - current_ee_pose.translation().y(),
       wrapAngle(desired_yaw - current_yaw);
 
-    // For the current fixed-base URDF, the generalized Jacobian reduces to the
-    // active right-arm frame Jacobian.  Feed forward the reference twist and
-    // close the loop directly in task space.
+    const Eigen::Matrix3d damped_task_matrix =
+      generalized_task_jacobian * generalized_task_jacobian.transpose() +
+      std::pow(controller_->damping, 2) * Eigen::Matrix3d::Identity();
     const Eigen::Vector3d commanded_task_velocity =
       desired_task_velocity + controller_->task_space_gain * task_error;
-    joint_velocity = task_jacobian.transpose() *
+    const Eigen::Matrix<double, kGeneralizedDof, 1> generalized_velocity =
+      generalized_task_jacobian.transpose() *
       damped_task_matrix.ldlt().solve(commanded_task_velocity);
+    base_velocity = generalized_velocity.head<kPlanarBaseDof>();
+    joint_velocity = generalized_velocity.tail<kRightArmDof>();
   } else {
     Eigen::Vector3d current_right_q;
     for (std::size_t index = 0; index < controller_->q_indices.size(); ++index) {
@@ -459,7 +543,10 @@ void PfrLowLevelControl::controlTimerCallback()
       return;
     }
 
-    joint_velocity = task_jacobian.transpose() *
+    const Eigen::Matrix3d damped_task_matrix =
+      arm_task_jacobian * arm_task_jacobian.transpose() +
+      std::pow(controller_->damping, 2) * Eigen::Matrix3d::Identity();
+    joint_velocity = arm_task_jacobian.transpose() *
       damped_task_matrix.ldlt().solve(desired_task_velocity);
     for (Eigen::Index index = 0; index < joint_velocity.size(); ++index) {
       joint_velocity[index] += controller_->joint_position_gain *
@@ -467,7 +554,7 @@ void PfrLowLevelControl::controlTimerCallback()
     }
   }
 
-  if (!joint_velocity.allFinite()) {
+  if (!base_velocity.allFinite() || !joint_velocity.allFinite()) {
     RCLCPP_ERROR_THROTTLE(
       this->get_logger(), *this->get_clock(), 2000,
       "Differential IK produced a non-finite command; commanding zero velocity.");
@@ -475,6 +562,19 @@ void PfrLowLevelControl::controlTimerCallback()
     controller_->command_active = false;
     return;
   }
+
+  std_msgs::msg::Float64MultiArray base_command;
+  base_command.data.resize(kPlanarBaseDof);
+  base_command.data[0] = std::clamp(
+    base_velocity[0], -controller_->max_base_linear_velocity,
+    controller_->max_base_linear_velocity);
+  base_command.data[1] = std::clamp(
+    base_velocity[1], -controller_->max_base_linear_velocity,
+    controller_->max_base_linear_velocity);
+  base_command.data[2] = std::clamp(
+    base_velocity[2], -controller_->max_base_yaw_velocity,
+    controller_->max_base_yaw_velocity);
+  base_velocity_pub_->publish(base_command);
 
   std_msgs::msg::Float64MultiArray command;
   command.data.resize(3);
@@ -489,6 +589,10 @@ void PfrLowLevelControl::controlTimerCallback()
 
 void PfrLowLevelControl::publishZeroVelocity()
 {
+  std_msgs::msg::Float64MultiArray base_command;
+  base_command.data = {0.0, 0.0, 0.0};
+  base_velocity_pub_->publish(base_command);
+
   std_msgs::msg::Float64MultiArray command;
   command.data = {0.0, 0.0, 0.0};
   joint_velocity_pub_->publish(command);

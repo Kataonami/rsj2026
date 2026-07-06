@@ -14,6 +14,7 @@ public:
   ~PfrStateEstimator() override;
 
 private:
+  void basePoseCallback(const geometry_msgs::msg::PoseStamped & pose);
   void jointStateCallback(const sensor_msgs::msg::JointState & joint_state_msg);
 
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr
@@ -22,6 +23,7 @@ private:
     left_current_joint_state_pub_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr right_ee_pose_pub_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr left_ee_pose_pub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr base_pose_sub_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr encoder_joint_state_sub_;
 
   struct KinematicsState;
