@@ -58,30 +58,30 @@ PfrHighLevelControl::PfrHighLevelControl()
   left_ee_twist_ref_pub_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(
     "/high_level/left/ee_twist_ref", 10);
 
-  ready_move_duration_s_ = this->declare_parameter<double>("ready_move_duration_s", 3.0);
+  ready_move_duration_s_ = this->declare_parameter<double>("ready_move_duration_s", 10.0);
   right_ready_x_m_ = this->declare_parameter<double>("right_ready_x_m", 0.0);
-  right_ready_y_m_ = this->declare_parameter<double>("right_ready_y_m", -0.660114);
+  right_ready_y_m_ = this->declare_parameter<double>("right_ready_y_m", -0.560114);
   right_ready_z_m_ = this->declare_parameter<double>("right_ready_z_m", 0.1975);
   left_ready_x_m_ = this->declare_parameter<double>("left_ready_x_m", 0.0);
-  left_ready_y_m_ = this->declare_parameter<double>("left_ready_y_m", 0.660114);
+  left_ready_y_m_ = this->declare_parameter<double>("left_ready_y_m", 0.560114);
   left_ready_z_m_ = this->declare_parameter<double>("left_ready_z_m", 0.1975);
-  circle_radius_m_ = this->declare_parameter<double>("circle_radius_m", 0.05);
-  circle_duration_s_ = this->declare_parameter<double>("circle_duration_s", 10.0);
+  circle_radius_m_ = this->declare_parameter<double>("circle_radius_m", 0.1);
+  circle_duration_s_ = this->declare_parameter<double>("circle_duration_s", 20.0);
   circle_revolutions_ = this->declare_parameter<double>("circle_revolutions", 1.0);
   trajectory_publish_rate_hz_ =
-    this->declare_parameter<double>("trajectory_publish_rate_hz", 50.0);
+    this->declare_parameter<double>("trajectory_publish_rate_hz", 20.0);
 
   if (ready_move_duration_s_ <= 0.0) {
-    RCLCPP_WARN(this->get_logger(), "ready_move_duration_s must be positive; using 3 s.");
-    ready_move_duration_s_ = 3.0;
+    RCLCPP_WARN(this->get_logger(), "ready_move_duration_s must be positive; using 10 s.");
+    ready_move_duration_s_ = 10.0;
   }
   if (circle_radius_m_ <= 0.0) {
-    RCLCPP_WARN(this->get_logger(), "circle_radius_m must be positive; using 0.05 m.");
-    circle_radius_m_ = 0.05;
+    RCLCPP_WARN(this->get_logger(), "circle_radius_m must be positive; using 0.1 m.");
+    circle_radius_m_ = 0.1;
   }
   if (circle_duration_s_ <= 0.0) {
-    RCLCPP_WARN(this->get_logger(), "circle_duration_s must be positive; using 10 s.");
-    circle_duration_s_ = 10.0;
+    RCLCPP_WARN(this->get_logger(), "circle_duration_s must be positive; using 20 s.");
+    circle_duration_s_ = 20.0;
   }
   if (circle_revolutions_ <= 0.0) {
     RCLCPP_WARN(this->get_logger(), "circle_revolutions must be positive; using 1.");
@@ -89,8 +89,8 @@ PfrHighLevelControl::PfrHighLevelControl()
   }
   if (trajectory_publish_rate_hz_ <= 0.0) {
     RCLCPP_WARN(
-      this->get_logger(), "trajectory_publish_rate_hz must be positive; using 50 Hz.");
-    trajectory_publish_rate_hz_ = 50.0;
+      this->get_logger(), "trajectory_publish_rate_hz must be positive; using 20 Hz.");
+    trajectory_publish_rate_hz_ = 20.0;
   }
 
   // sub

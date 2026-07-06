@@ -80,7 +80,7 @@ private:
   double circle_radius_m_ = 0.05;
   double circle_duration_s_ = 10.0;
   double circle_revolutions_ = 1.0;
-  double trajectory_publish_rate_hz_ = 50.0;
+  double trajectory_publish_rate_hz_ = 20.0;
   std_msgs::msg::Float64MultiArray ee_vel_cmd_;
   sensor_msgs::msg::JointState right_current_joint_state_;
   sensor_msgs::msg::JointState left_current_joint_state_;

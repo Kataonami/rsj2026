@@ -32,7 +32,10 @@ def generate_launch_description():
         executable="pfr_high_level_control",
         name="pfr_high_level_control",
         output="screen",
-        parameters=[{"use_sim_time": use_sim_time}],
+        parameters=[{
+            "use_sim_time": use_sim_time,
+            "trajectory_publish_rate_hz": 20.0,
+        }],
     )
 
     low_level_controller = Node(
@@ -43,6 +46,7 @@ def generate_launch_description():
         parameters=[{
             "use_sim_time": use_sim_time,
             "urdf_path": urdf_path,
+            "control_rate_hz": 50.0,
         }],
     )
 
