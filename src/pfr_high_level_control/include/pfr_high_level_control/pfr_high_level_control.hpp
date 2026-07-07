@@ -40,6 +40,7 @@ private:
   void circleTrajectoryCommandCallback(const std_msgs::msg::UInt8 & circle_cmd);
   void rightEePoseCallback(const geometry_msgs::msg::PoseStamped & pose);
   void leftEePoseCallback(const geometry_msgs::msg::PoseStamped & pose);
+  void basePoseCallback(const geometry_msgs::msg::PoseStamped & pose);
   void rightJointStateCallback(const sensor_msgs::msg::JointState & joint_state);
   void leftJointStateCallback(const sensor_msgs::msg::JointState & joint_state);
   void trajectoryTimerCallback();
@@ -63,6 +64,7 @@ private:
   rclcpp::Subscription<std_msgs::msg::UInt8>::SharedPtr circle_trajectory_command_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr right_ee_pose_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr left_ee_pose_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr base_pose_sub_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr right_joint_state_sub_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr left_joint_state_sub_;
 
@@ -82,8 +84,10 @@ private:
   double circle_revolutions_ = 1.0;
   double trajectory_publish_rate_hz_ = 20.0;
   std_msgs::msg::Float64MultiArray ee_vel_cmd_;
+  geometry_msgs::msg::PoseStamped base_pose_;
   sensor_msgs::msg::JointState right_current_joint_state_;
   sensor_msgs::msg::JointState left_current_joint_state_;
+  bool base_pose_received_ = false;
   bool right_joint_state_received_ = false;
   bool left_joint_state_received_ = false;
   CircleTrajectoryState right_circle_state_;

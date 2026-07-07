@@ -70,6 +70,8 @@ PfrHighLevelControl::PfrHighLevelControl()
   circle_revolutions_ = this->declare_parameter<double>("circle_revolutions", 1.0);
   trajectory_publish_rate_hz_ =
     this->declare_parameter<double>("trajectory_publish_rate_hz", 20.0);
+  const auto base_pose_topic =
+    this->declare_parameter<std::string>("base_pose_topic", "/optitrack/base_pose");
 
   if (ready_move_duration_s_ <= 0.0) {
     RCLCPP_WARN(this->get_logger(), "ready_move_duration_s must be positive; using 10 s.");
@@ -118,6 +120,10 @@ PfrHighLevelControl::PfrHighLevelControl()
       &PfrHighLevelControl::leftJointStateCallback, this,
       std::placeholders::_1));
 
+  base_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
+    base_pose_topic, 10,
+    std::bind(&PfrHighLevelControl::basePoseCallback, this, std::placeholders::_1));
+
   // timer
   const auto timer_period = std::chrono::duration<double>(1.0 / trajectory_publish_rate_hz_);
   trajectory_timer_ = this->create_wall_timer(
@@ -162,6 +168,18 @@ void PfrHighLevelControl::leftEePoseCallback(
 {
   left_circle_state_.current_pose = pose;
   left_circle_state_.current_pose_received = true;
+}
+
+void PfrHighLevelControl::basePoseCallback(
+  const geometry_msgs::msg::PoseStamped & pose)
+{
+  base_pose_ = pose;
+  if (!base_pose_received_) {
+    RCLCPP_INFO(
+      this->get_logger(), "Received OptiTrack base pose on frame '%s'.",
+      pose.header.frame_id.c_str());
+    base_pose_received_ = true;
+  }
 }
 
 void PfrHighLevelControl::rightJointStateCallback(

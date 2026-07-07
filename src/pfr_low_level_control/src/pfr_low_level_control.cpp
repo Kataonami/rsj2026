@@ -26,9 +26,10 @@ constexpr std::array<const char *, 3> kInputJointNames = {
   "joint1_R", "joint2_R", "joint3_R"};
 constexpr std::array<const char *, 3> kModelJointNames = {
   "joint1_R", "joint2_R", "joint3_R"};
-constexpr std::size_t kPlanarBaseDof = 3;
+constexpr std::size_t kFloatingBaseDof = 6;
+constexpr std::size_t kPlanarTaskDof = 3;
 constexpr std::size_t kRightArmDof = 3;
-constexpr std::size_t kGeneralizedDof = kPlanarBaseDof + kRightArmDof;
+constexpr std::size_t kGeneralizedDof = kFloatingBaseDof + kRightArmDof;
 
 double wrapAngle(double angle)
 {
@@ -48,19 +49,27 @@ double quaternionYaw(const geometry_msgs::msg::Quaternion & quaternion_msg)
   return std::atan2(rotation(1, 0), rotation(0, 0));
 }
 
-void setPlanarFloatingBaseConfiguration(
+void setFloatingBaseConfiguration(
   const geometry_msgs::msg::Pose & base_pose,
   Eigen::VectorXd & q,
   Eigen::Index base_q_index)
 {
-  const double yaw = quaternionYaw(base_pose.orientation);
   q[base_q_index + 0] = base_pose.position.x;
   q[base_q_index + 1] = base_pose.position.y;
-  q[base_q_index + 2] = 0.0;
-  q[base_q_index + 3] = 0.0;
-  q[base_q_index + 4] = 0.0;
-  q[base_q_index + 5] = std::sin(0.5 * yaw);
-  q[base_q_index + 6] = std::cos(0.5 * yaw);
+  q[base_q_index + 2] = base_pose.position.z;
+
+  Eigen::Quaterniond quaternion(
+    base_pose.orientation.w, base_pose.orientation.x,
+    base_pose.orientation.y, base_pose.orientation.z);
+  if (quaternion.norm() < 1.0e-9) {
+    quaternion.setIdentity();
+  } else {
+    quaternion.normalize();
+  }
+  q[base_q_index + 3] = quaternion.x();
+  q[base_q_index + 4] = quaternion.y();
+  q[base_q_index + 5] = quaternion.z();
+  q[base_q_index + 6] = quaternion.w();
 }
 
 bool solvePlanarPositionIk(
@@ -144,7 +153,7 @@ struct PfrLowLevelControl::ControllerState
   std::unique_ptr<pinocchio::Data> data;
   Eigen::VectorXd q;
   Eigen::Index base_q_index{-1};
-  std::array<Eigen::Index, 3> base_v_indices{};
+  std::array<Eigen::Index, kFloatingBaseDof> base_v_indices{};
   std::array<Eigen::Index, 3> q_indices{};
   std::array<Eigen::Index, 3> v_indices{};
   std::array<pinocchio::JointIndex, 3> joint_ids{};
@@ -249,8 +258,11 @@ PfrLowLevelControl::PfrLowLevelControl()
     }
     controller_->base_q_index = base_joint_model.idx_q();
     controller_->base_v_indices = {
-      base_joint_model.idx_v(),
+      base_joint_model.idx_v() + 0,
       base_joint_model.idx_v() + 1,
+      base_joint_model.idx_v() + 2,
+      base_joint_model.idx_v() + 3,
+      base_joint_model.idx_v() + 4,
       base_joint_model.idx_v() + 5};
 
     for (std::size_t index = 0; index < kModelJointNames.size(); ++index) {
@@ -376,7 +388,7 @@ void PfrLowLevelControl::basePoseCallback(const geometry_msgs::msg::PoseStamped 
       pose.header.frame_id.c_str(), controller_->base_frame_id.c_str());
   }
 
-  setPlanarFloatingBaseConfiguration(
+  setFloatingBaseConfiguration(
     pose.pose, controller_->q, controller_->base_q_index);
   controller_->base_pose_received = true;
   controller_->last_base_pose_time = this->now();
@@ -470,53 +482,78 @@ void PfrLowLevelControl::controlTimerCallback()
     controller_->ee_frame_id, pinocchio::LOCAL_WORLD_ALIGNED,
     full_jacobian);
 
-  Eigen::Matrix<double, 3, kGeneralizedDof> generalized_task_jacobian;
+  Eigen::Matrix<double, 6, kGeneralizedDof> generalized_task_jacobian;
   for (std::size_t index = 0; index < controller_->base_v_indices.size(); ++index) {
     const Eigen::Index column = controller_->base_v_indices[index];
-    generalized_task_jacobian(0, index) = full_jacobian(0, column);
-    generalized_task_jacobian(1, index) = full_jacobian(1, column);
-    generalized_task_jacobian(2, index) = full_jacobian(5, column);
+    generalized_task_jacobian.col(static_cast<Eigen::Index>(index)) =
+      full_jacobian.col(column);
   }
   for (std::size_t index = 0; index < controller_->v_indices.size(); ++index) {
     const Eigen::Index column = controller_->v_indices[index];
-    const std::size_t generalized_index = kPlanarBaseDof + index;
-    generalized_task_jacobian(0, generalized_index) = full_jacobian(0, column);
-    generalized_task_jacobian(1, generalized_index) = full_jacobian(1, column);
-    generalized_task_jacobian(2, generalized_index) = full_jacobian(5, column);
+    const std::size_t generalized_index = kFloatingBaseDof + index;
+    generalized_task_jacobian.col(static_cast<Eigen::Index>(generalized_index)) =
+      full_jacobian.col(column);
   }
-  const Eigen::Matrix3d arm_task_jacobian =
-    generalized_task_jacobian.block<3, kRightArmDof>(0, kPlanarBaseDof);
+  Eigen::Matrix<double, kPlanarTaskDof, kRightArmDof> arm_planar_task_jacobian;
+  for (std::size_t index = 0; index < controller_->v_indices.size(); ++index) {
+    const Eigen::Index column = controller_->v_indices[index];
+    arm_planar_task_jacobian(0, static_cast<Eigen::Index>(index)) =
+      full_jacobian(0, column);
+    arm_planar_task_jacobian(1, static_cast<Eigen::Index>(index)) =
+      full_jacobian(1, column);
+    arm_planar_task_jacobian(2, static_cast<Eigen::Index>(index)) =
+      full_jacobian(5, column);
+  }
 
-  Eigen::Vector3d desired_task_velocity;
+  Eigen::Matrix<double, 6, 1> desired_task_velocity;
   desired_task_velocity <<
     controller_->twist_reference.twist.linear.x,
     controller_->twist_reference.twist.linear.y,
+    controller_->twist_reference.twist.linear.z,
+    controller_->twist_reference.twist.angular.x,
+    controller_->twist_reference.twist.angular.y,
     controller_->twist_reference.twist.angular.z;
 
-  Eigen::Vector3d base_velocity = Eigen::Vector3d::Zero();
+  Eigen::Matrix<double, kFloatingBaseDof, 1> base_velocity =
+    Eigen::Matrix<double, kFloatingBaseDof, 1>::Zero();
   Eigen::Vector3d joint_velocity;
   if (controller_->control_mode == "generalized_jacobian") {
     const auto & current_ee_pose =
       controller_->data->oMf[controller_->ee_frame_id];
-    const double current_yaw = std::atan2(
-      current_ee_pose.rotation()(1, 0), current_ee_pose.rotation()(0, 0));
-    const double desired_yaw = quaternionYaw(
-      controller_->pose_reference.pose.orientation);
-    Eigen::Vector3d task_error;
+    Eigen::Quaterniond desired_orientation(
+      controller_->pose_reference.pose.orientation.w,
+      controller_->pose_reference.pose.orientation.x,
+      controller_->pose_reference.pose.orientation.y,
+      controller_->pose_reference.pose.orientation.z);
+    if (desired_orientation.norm() < 1.0e-9) {
+      desired_orientation.setIdentity();
+    } else {
+      desired_orientation.normalize();
+    }
+    const Eigen::Matrix3d rotation_error =
+      desired_orientation.toRotationMatrix() * current_ee_pose.rotation().transpose();
+    const Eigen::AngleAxisd angle_axis_error(rotation_error);
+    const Eigen::Vector3d angular_error =
+      angle_axis_error.angle() * angle_axis_error.axis();
+
+    Eigen::Matrix<double, 6, 1> task_error;
     task_error <<
       controller_->pose_reference.pose.position.x - current_ee_pose.translation().x(),
       controller_->pose_reference.pose.position.y - current_ee_pose.translation().y(),
-      wrapAngle(desired_yaw - current_yaw);
+      controller_->pose_reference.pose.position.z - current_ee_pose.translation().z(),
+      angular_error.x(),
+      angular_error.y(),
+      angular_error.z();
 
-    const Eigen::Matrix3d damped_task_matrix =
+    const Eigen::Matrix<double, 6, 6> damped_task_matrix =
       generalized_task_jacobian * generalized_task_jacobian.transpose() +
-      std::pow(controller_->damping, 2) * Eigen::Matrix3d::Identity();
-    const Eigen::Vector3d commanded_task_velocity =
+      std::pow(controller_->damping, 2) * Eigen::Matrix<double, 6, 6>::Identity();
+    const Eigen::Matrix<double, 6, 1> commanded_task_velocity =
       desired_task_velocity + controller_->task_space_gain * task_error;
     const Eigen::Matrix<double, kGeneralizedDof, 1> generalized_velocity =
       generalized_task_jacobian.transpose() *
       damped_task_matrix.ldlt().solve(commanded_task_velocity);
-    base_velocity = generalized_velocity.head<kPlanarBaseDof>();
+    base_velocity = generalized_velocity.head<kFloatingBaseDof>();
     joint_velocity = generalized_velocity.tail<kRightArmDof>();
   } else {
     Eigen::Vector3d current_right_q;
@@ -543,11 +580,14 @@ void PfrLowLevelControl::controlTimerCallback()
       return;
     }
 
+    Eigen::Vector3d desired_planar_task_velocity;
+    desired_planar_task_velocity <<
+      desired_task_velocity[0], desired_task_velocity[1], desired_task_velocity[5];
     const Eigen::Matrix3d damped_task_matrix =
-      arm_task_jacobian * arm_task_jacobian.transpose() +
+      arm_planar_task_jacobian * arm_planar_task_jacobian.transpose() +
       std::pow(controller_->damping, 2) * Eigen::Matrix3d::Identity();
-    joint_velocity = arm_task_jacobian.transpose() *
-      damped_task_matrix.ldlt().solve(desired_task_velocity);
+    joint_velocity = arm_planar_task_jacobian.transpose() *
+      damped_task_matrix.ldlt().solve(desired_planar_task_velocity);
     for (Eigen::Index index = 0; index < joint_velocity.size(); ++index) {
       joint_velocity[index] += controller_->joint_position_gain *
         wrapAngle(desired_right_q[index] - current_right_q[index]);
@@ -564,16 +604,19 @@ void PfrLowLevelControl::controlTimerCallback()
   }
 
   std_msgs::msg::Float64MultiArray base_command;
-  base_command.data.resize(kPlanarBaseDof);
-  base_command.data[0] = std::clamp(
-    base_velocity[0], -controller_->max_base_linear_velocity,
-    controller_->max_base_linear_velocity);
-  base_command.data[1] = std::clamp(
-    base_velocity[1], -controller_->max_base_linear_velocity,
-    controller_->max_base_linear_velocity);
-  base_command.data[2] = std::clamp(
-    base_velocity[2], -controller_->max_base_yaw_velocity,
-    controller_->max_base_yaw_velocity);
+  base_command.data.resize(kFloatingBaseDof);
+  for (std::size_t index = 0; index < 3; ++index) {
+    base_command.data[index] = std::clamp(
+      base_velocity[static_cast<Eigen::Index>(index)],
+      -controller_->max_base_linear_velocity,
+      controller_->max_base_linear_velocity);
+  }
+  for (std::size_t index = 3; index < kFloatingBaseDof; ++index) {
+    base_command.data[index] = std::clamp(
+      base_velocity[static_cast<Eigen::Index>(index)],
+      -controller_->max_base_yaw_velocity,
+      controller_->max_base_yaw_velocity);
+  }
   base_velocity_pub_->publish(base_command);
 
   std_msgs::msg::Float64MultiArray command;
@@ -590,7 +633,7 @@ void PfrLowLevelControl::controlTimerCallback()
 void PfrLowLevelControl::publishZeroVelocity()
 {
   std_msgs::msg::Float64MultiArray base_command;
-  base_command.data = {0.0, 0.0, 0.0};
+  base_command.data = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   base_velocity_pub_->publish(base_command);
 
   std_msgs::msg::Float64MultiArray command;
