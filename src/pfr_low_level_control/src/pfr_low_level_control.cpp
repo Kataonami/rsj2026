@@ -191,7 +191,7 @@ struct PfrLowLevelControl::ControllerState
   double command_timeout_s{0.25};
   double control_rate_hz{50.0};
   std::string base_frame_id{"base_link"};
-  std::string base_pose_topic{"/optitrack/base_pose"};
+  std::string base_pose_topic{"/vrpn_mocap/PFR_Arm/pose"};
 };
 
 PfrLowLevelControl::PfrLowLevelControl()
@@ -210,7 +210,7 @@ PfrLowLevelControl::PfrLowLevelControl()
   controller_->base_frame_id =
     this->declare_parameter<std::string>("base_frame_id", "base_link");
   controller_->base_pose_topic =
-    this->declare_parameter<std::string>("base_pose_topic", "/optitrack/base_pose");
+    this->declare_parameter<std::string>("base_pose_topic", "/vrpn_mocap/PFR_Arm/pose");
   controller_->control_mode =
     this->declare_parameter<std::string>("control_mode", "generalized_jacobian");
   controller_->require_live_base_pose =
@@ -356,7 +356,7 @@ PfrLowLevelControl::PfrLowLevelControl()
     "/base_velocity_cmd", 10);
   base_pose_sub_ =
     this->create_subscription<geometry_msgs::msg::PoseStamped>(
-    controller_->base_pose_topic, 10,
+    controller_->base_pose_topic, rclcpp::SensorDataQoS(),
     std::bind(
       &PfrLowLevelControl::basePoseCallback, this,
       std::placeholders::_1));

@@ -23,7 +23,6 @@ private:
   enum class TrajectoryPhase : std::uint8_t
   {
     kIdle,
-    kMoveToReady,
     kCircle
   };
 
@@ -72,13 +71,6 @@ private:
   rclcpp::TimerBase::SharedPtr trajectory_timer_;
 
   double speed_limit_ = 0.25; // Set the maximum velocity
-  double ready_move_duration_s_ = 3.0;
-  double right_ready_x_m_ = 0.0;
-  double right_ready_y_m_ = -0.660114;
-  double right_ready_z_m_ = 0.1975;
-  double left_ready_x_m_ = 0.0;
-  double left_ready_y_m_ = 0.660114;
-  double left_ready_z_m_ = 0.1975;
   double circle_radius_m_ = 0.05;
   double circle_duration_s_ = 10.0;
   double circle_revolutions_ = 1.0;

@@ -27,18 +27,6 @@ TimeScaling quinticTimeScaling(double elapsed_s, double duration_s)
     (30.0 * tau2 - 60.0 * tau3 + 30.0 * tau4) / duration_s};
 }
 
-double wrapAngle(double angle)
-{
-  return std::atan2(std::sin(angle), std::cos(angle));
-}
-
-double quaternionYaw(const geometry_msgs::msg::Quaternion & quaternion)
-{
-  return std::atan2(
-    2.0 * (quaternion.w * quaternion.z + quaternion.x * quaternion.y),
-    1.0 - 2.0 *
-    (quaternion.y * quaternion.y + quaternion.z * quaternion.z));
-}
 }
 
 PfrHighLevelControl::PfrHighLevelControl()
@@ -58,25 +46,14 @@ PfrHighLevelControl::PfrHighLevelControl()
   left_ee_twist_ref_pub_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(
     "/high_level/left/ee_twist_ref", 10);
 
-  ready_move_duration_s_ = this->declare_parameter<double>("ready_move_duration_s", 10.0);
-  right_ready_x_m_ = this->declare_parameter<double>("right_ready_x_m", 0.0);
-  right_ready_y_m_ = this->declare_parameter<double>("right_ready_y_m", -0.560114);
-  right_ready_z_m_ = this->declare_parameter<double>("right_ready_z_m", 0.1975);
-  left_ready_x_m_ = this->declare_parameter<double>("left_ready_x_m", 0.0);
-  left_ready_y_m_ = this->declare_parameter<double>("left_ready_y_m", 0.560114);
-  left_ready_z_m_ = this->declare_parameter<double>("left_ready_z_m", 0.1975);
   circle_radius_m_ = this->declare_parameter<double>("circle_radius_m", 0.1);
   circle_duration_s_ = this->declare_parameter<double>("circle_duration_s", 20.0);
   circle_revolutions_ = this->declare_parameter<double>("circle_revolutions", 1.0);
   trajectory_publish_rate_hz_ =
     this->declare_parameter<double>("trajectory_publish_rate_hz", 20.0);
   const auto base_pose_topic =
-    this->declare_parameter<std::string>("base_pose_topic", "/optitrack/base_pose");
+    this->declare_parameter<std::string>("base_pose_topic", "/vrpn_mocap/PFR_Arm/pose");
 
-  if (ready_move_duration_s_ <= 0.0) {
-    RCLCPP_WARN(this->get_logger(), "ready_move_duration_s must be positive; using 10 s.");
-    ready_move_duration_s_ = 10.0;
-  }
   if (circle_radius_m_ <= 0.0) {
     RCLCPP_WARN(this->get_logger(), "circle_radius_m must be positive; using 0.1 m.");
     circle_radius_m_ = 0.1;
@@ -121,7 +98,7 @@ PfrHighLevelControl::PfrHighLevelControl()
       std::placeholders::_1));
 
   base_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
-    base_pose_topic, 10,
+    base_pose_topic, rclcpp::SensorDataQoS(),
     std::bind(&PfrHighLevelControl::basePoseCallback, this, std::placeholders::_1));
 
   // timer
@@ -220,22 +197,15 @@ void PfrHighLevelControl::startCircleTrajectory(
     state.start_pose.header.frame_id = "world";
   }
   state.start_time = this->now();
-  state.phase = TrajectoryPhase::kMoveToReady;
-
-  const bool is_right_arm = std::string(arm_name) == "right";
-  const double ready_x = is_right_arm ? right_ready_x_m_ : left_ready_x_m_;
-  const double ready_y = is_right_arm ? right_ready_y_m_ : left_ready_y_m_;
-  const double ready_z = is_right_arm ? right_ready_z_m_ : left_ready_z_m_;
+  state.phase = TrajectoryPhase::kCircle;
 
   RCLCPP_INFO(
     this->get_logger(),
-    "%s-hand preparation started: current=(%.4f, %.4f, %.4f), "
-    "ready=(%.4f, %.4f, %.4f), duration=%.3f s.",
+    "%s-hand circle trajectory started at current pose: (%.4f, %.4f, %.4f).",
     arm_name,
     state.start_pose.pose.position.x,
     state.start_pose.pose.position.y,
-    state.start_pose.pose.position.z,
-    ready_x, ready_y, ready_z, ready_move_duration_s_);
+    state.start_pose.pose.position.z);
 }
 
 void PfrHighLevelControl::trajectoryTimerCallback()
@@ -265,71 +235,27 @@ void PfrHighLevelControl::publishTrajectoryReference(
   geometry_msgs::msg::TwistStamped twist_ref;
   twist_ref.header = pose_ref.header;
 
-  if (state.phase == TrajectoryPhase::kMoveToReady) {
-    const TimeScaling scaling = quinticTimeScaling(elapsed_s, ready_move_duration_s_);
-    const bool is_right_arm = std::string(arm_name) == "right";
-    const double ready_x = is_right_arm ? right_ready_x_m_ : left_ready_x_m_;
-    const double ready_y = is_right_arm ? right_ready_y_m_ : left_ready_y_m_;
-    const double ready_z = is_right_arm ? right_ready_z_m_ : left_ready_z_m_;
-    const double delta_x = ready_x - state.start_pose.pose.position.x;
-    const double delta_y = ready_y - state.start_pose.pose.position.y;
-    const double delta_z = ready_z - state.start_pose.pose.position.z;
+  const TimeScaling scaling = quinticTimeScaling(elapsed_s, circle_duration_s_);
+  const double total_angle = 2.0 * kPi * circle_revolutions_;
+  const double phase = total_angle * scaling.position;
+  const double phase_rate = total_angle * scaling.velocity;
 
-    pose_ref.pose.position.x = state.start_pose.pose.position.x + scaling.position * delta_x;
-    pose_ref.pose.position.y = state.start_pose.pose.position.y + scaling.position * delta_y;
-    pose_ref.pose.position.z = state.start_pose.pose.position.z + scaling.position * delta_z;
-    twist_ref.twist.linear.x = scaling.velocity * delta_x;
-    twist_ref.twist.linear.y = scaling.velocity * delta_y;
-    twist_ref.twist.linear.z = scaling.velocity * delta_z;
+  pose_ref.pose.position.x =
+    state.start_pose.pose.position.x + circle_radius_m_ * (std::cos(phase) - 1.0);
+  pose_ref.pose.position.y =
+    state.start_pose.pose.position.y + circle_radius_m_ * std::sin(phase);
+  pose_ref.pose.position.z = state.start_pose.pose.position.z;
+  // Identity orientation keeps the end-effector frame pointed along world +X.
+  pose_ref.pose.orientation.w = 1.0;
+  twist_ref.twist.linear.x = -circle_radius_m_ * std::sin(phase) * phase_rate;
+  twist_ref.twist.linear.y = circle_radius_m_ * std::cos(phase) * phase_rate;
 
-    const double start_yaw = quaternionYaw(state.start_pose.pose.orientation);
-    const double yaw_error = wrapAngle(-start_yaw);
-    const double yaw_ref = start_yaw + scaling.position * yaw_error;
-    pose_ref.pose.orientation.z = std::sin(0.5 * yaw_ref);
-    pose_ref.pose.orientation.w = std::cos(0.5 * yaw_ref);
-    twist_ref.twist.angular.z = scaling.velocity * yaw_error;
-
-    if (elapsed_s >= ready_move_duration_s_) {
-      pose_ref.pose.position.x = ready_x;
-      pose_ref.pose.position.y = ready_y;
-      pose_ref.pose.position.z = ready_z;
-      pose_ref.pose.orientation.z = 0.0;
-      pose_ref.pose.orientation.w = 1.0;
-      twist_ref.twist.linear.x = 0.0;
-      twist_ref.twist.linear.y = 0.0;
-      twist_ref.twist.linear.z = 0.0;
-      twist_ref.twist.angular.z = 0.0;
-
-      state.start_pose = pose_ref;
-      state.start_time = stamp;
-      state.phase = TrajectoryPhase::kCircle;
-      RCLCPP_INFO(
-        this->get_logger(),
-        "%s hand reached the ready pose; circle trajectory started.", arm_name);
-    }
-  } else {
-    const TimeScaling scaling = quinticTimeScaling(elapsed_s, circle_duration_s_);
-    const double total_angle = 2.0 * kPi * circle_revolutions_;
-    const double phase = total_angle * scaling.position;
-    const double phase_rate = total_angle * scaling.velocity;
-
-    pose_ref.pose.position.x =
-      state.start_pose.pose.position.x + circle_radius_m_ * (std::cos(phase) - 1.0);
-    pose_ref.pose.position.y =
-      state.start_pose.pose.position.y + circle_radius_m_ * std::sin(phase);
-    pose_ref.pose.position.z = state.start_pose.pose.position.z;
-    // Identity orientation keeps the end-effector frame pointed along world +X.
-    pose_ref.pose.orientation.w = 1.0;
-    twist_ref.twist.linear.x = -circle_radius_m_ * std::sin(phase) * phase_rate;
-    twist_ref.twist.linear.y = circle_radius_m_ * std::cos(phase) * phase_rate;
-
-    if (elapsed_s >= circle_duration_s_) {
-      pose_ref.pose.position = state.start_pose.pose.position;
-      twist_ref.twist.linear.x = 0.0;
-      twist_ref.twist.linear.y = 0.0;
-      state.phase = TrajectoryPhase::kIdle;
-      RCLCPP_INFO(this->get_logger(), "%s-hand circle trajectory completed.", arm_name);
-    }
+  if (elapsed_s >= circle_duration_s_) {
+    pose_ref.pose.position = state.start_pose.pose.position;
+    twist_ref.twist.linear.x = 0.0;
+    twist_ref.twist.linear.y = 0.0;
+    state.phase = TrajectoryPhase::kIdle;
+    RCLCPP_INFO(this->get_logger(), "%s-hand circle trajectory completed.", arm_name);
   }
 
   pose_pub->publish(pose_ref);

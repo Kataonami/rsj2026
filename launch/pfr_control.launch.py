@@ -17,6 +17,7 @@ def generate_launch_description():
     start_rviz = LaunchConfiguration("start_rviz")
     use_optitrack = LaunchConfiguration("use_optitrack")
     base_pose_topic = LaunchConfiguration("base_pose_topic")
+    optitrack_raw_pose_topic = LaunchConfiguration("optitrack_raw_pose_topic")
     optitrack_is_enabled = ["'", use_optitrack, "'.lower() in ['true', '1', 'yes', 'on']"]
     low_level_control_mode = PythonExpression([
         "'generalized_jacobian' if ", *optitrack_is_enabled, " else 'analytic_ik'"
@@ -45,6 +46,31 @@ def generate_launch_description():
         }.items(),
     )
 
+    room_to_world_tf = Node(
+        package="pfr_tf_broadcaster",
+        executable="room_to_world_static_tf.py",
+        name="room_to_world_static_tf",
+        condition=IfCondition(use_optitrack),
+        output="screen",
+        parameters=[{"use_sim_time": use_sim_time}],
+    )
+
+    base_pose_transformer = Node(
+        package="pfr_tf_broadcaster",
+        executable="base_pose_transformer.py",
+        name="base_pose_transformer",
+        condition=IfCondition(use_optitrack),
+        output="screen",
+        parameters=[{
+            "use_sim_time": use_sim_time,
+            "input_topic": optitrack_raw_pose_topic,
+            "output_topic": base_pose_topic,
+            "target_frame": "world",
+            "source_frame_override": "room",
+            "default_source_frame": "room",
+        }],
+    )
+
     high_level_controller = Node(
         package="pfr_high_level_control",
         executable="pfr_high_level_control",
@@ -53,6 +79,7 @@ def generate_launch_description():
         parameters=[{
             "use_sim_time": use_sim_time,
             "trajectory_publish_rate_hz": 20.0,
+            "base_pose_topic": base_pose_topic,
         }],
     )
 
@@ -131,13 +158,20 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "base_pose_topic",
-            default_value="/optitrack/base_pose",
-            description="Live floating-base pose topic for OptiTrack mode.",
+            default_value="/pfr/base_pose",
+            description="Floating-base pose topic in the robot world frame.",
         ),
-        pfr_bringup,
+        DeclareLaunchArgument(
+            "optitrack_raw_pose_topic",
+            default_value="/vrpn_mocap/PFR_Arm/pose",
+            description="Raw OptiTrack pose topic before TF frame conversion.",
+        ),
+        room_to_world_tf,
+        base_pose_transformer,
+        # pfr_bringup,
         joy,
         high_level_controller,
         low_level_controller,
         path_visualizer,
-        rviz,
+        # rviz,
     ])
