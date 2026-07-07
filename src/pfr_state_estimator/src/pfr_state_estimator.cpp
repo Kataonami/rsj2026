@@ -92,6 +92,29 @@ geometry_msgs::msg::PoseStamped makePoseStamped(
   pose.pose.orientation.w = quaternion.w();
   return pose;
 }
+
+void setFloatingBaseConfiguration(
+  const geometry_msgs::msg::Pose & base_pose,
+  Eigen::VectorXd & q,
+  Eigen::Index base_q_index)
+{
+  q[base_q_index + 0] = base_pose.position.x;
+  q[base_q_index + 1] = base_pose.position.y;
+  q[base_q_index + 2] = base_pose.position.z;
+
+  Eigen::Quaterniond quaternion(
+    base_pose.orientation.w, base_pose.orientation.x,
+    base_pose.orientation.y, base_pose.orientation.z);
+  if (quaternion.norm() < 1.0e-9) {
+    quaternion.setIdentity();
+  } else {
+    quaternion.normalize();
+  }
+  q[base_q_index + 3] = quaternion.x();
+  q[base_q_index + 4] = quaternion.y();
+  q[base_q_index + 5] = quaternion.z();
+  q[base_q_index + 6] = quaternion.w();
+}
 }  // namespace
 
 struct PfrStateEstimator::KinematicsState
@@ -99,6 +122,7 @@ struct PfrStateEstimator::KinematicsState
   pinocchio::Model model;
   std::unique_ptr<pinocchio::Data> data;
   Eigen::VectorXd q;
+  Eigen::Index base_q_index{-1};
   std::array<Eigen::Index, 3> right_q_indices{};
   std::array<Eigen::Index, 3> left_q_indices{};
   std::array<bool, 3> right_joint_received{};
@@ -106,6 +130,7 @@ struct PfrStateEstimator::KinematicsState
   pinocchio::FrameIndex right_ee_frame_id{0};
   pinocchio::FrameIndex left_ee_frame_id{0};
   std::string base_frame_id{"base_link"};
+  std::string base_pose_topic{"/optitrack/base_pose"};
 };
 
 PfrStateEstimator::PfrStateEstimator()
@@ -123,13 +148,27 @@ PfrStateEstimator::PfrStateEstimator()
     this->declare_parameter<std::string>("right_ee_frame", "joint3_R");
   const auto left_ee_frame =
     this->declare_parameter<std::string>("left_ee_frame", "joint3_L");
+  const auto base_joint =
+    this->declare_parameter<std::string>("base_joint", "world_to_base");
   kinematics_->base_frame_id =
     this->declare_parameter<std::string>("base_frame_id", "base_link");
+  kinematics_->base_pose_topic =
+    this->declare_parameter<std::string>("base_pose_topic", "/optitrack/base_pose");
 
   try {
     pinocchio::urdf::buildModel(urdf_path, kinematics_->model);
     kinematics_->data = std::make_unique<pinocchio::Data>(kinematics_->model);
     kinematics_->q = pinocchio::neutral(kinematics_->model);
+
+    if (!kinematics_->model.existJointName(base_joint)) {
+      throw std::runtime_error("Floating base joint not found: " + base_joint);
+    }
+    const auto base_joint_id = kinematics_->model.getJointId(base_joint);
+    const auto & base_joint_model = kinematics_->model.joints[base_joint_id];
+    if (base_joint_model.nq() < 7) {
+      throw std::runtime_error("Expected a floating base joint with nq>=7: " + base_joint);
+    }
+    kinematics_->base_q_index = base_joint_model.idx_q();
 
     const auto configure_joint_indices =
       [this](
@@ -182,6 +221,12 @@ PfrStateEstimator::PfrStateEstimator()
     "/current_ee_pose_L", 10);
 
   // sub
+  base_pose_sub_ =
+    this->create_subscription<geometry_msgs::msg::PoseStamped>(
+    kinematics_->base_pose_topic, 10,
+    std::bind(
+      &PfrStateEstimator::basePoseCallback, this,
+      std::placeholders::_1));
   encoder_joint_state_sub_ =
     this->create_subscription<sensor_msgs::msg::JointState>(
     "/joint_states", 10,
@@ -197,6 +242,13 @@ PfrStateEstimator::PfrStateEstimator()
 }
 
 PfrStateEstimator::~PfrStateEstimator() = default;
+
+void PfrStateEstimator::basePoseCallback(
+  const geometry_msgs::msg::PoseStamped & pose)
+{
+  setFloatingBaseConfiguration(
+    pose.pose, kinematics_->q, kinematics_->base_q_index);
+}
 
 void PfrStateEstimator::jointStateCallback(
   const sensor_msgs::msg::JointState & joint_state_msg)

@@ -175,11 +175,13 @@ struct PfrLowLevelControl::ControllerState
   rclcpp::Time last_pose_reference_time{0, 0, RCL_ROS_TIME};
   rclcpp::Time last_twist_reference_time{0, 0, RCL_ROS_TIME};
   bool base_pose_received{false};
+  bool live_base_pose_received{false};
   bool pose_reference_received{false};
   bool twist_reference_received{false};
   bool command_active{false};
 
   std::string control_mode{"generalized_jacobian"};
+  bool require_live_base_pose{false};
   double joint_position_gain{2.0};
   double task_space_gain{2.0};
   double damping{0.05};
@@ -188,7 +190,7 @@ struct PfrLowLevelControl::ControllerState
   double max_joint_velocity{2.0};
   double command_timeout_s{0.25};
   double control_rate_hz{50.0};
-  std::string base_frame_id{"world"};
+  std::string base_frame_id{"base_link"};
   std::string base_pose_topic{"/optitrack/base_pose"};
 };
 
@@ -206,11 +208,13 @@ PfrLowLevelControl::PfrLowLevelControl()
   const auto base_joint =
     this->declare_parameter<std::string>("base_joint", "world_to_base");
   controller_->base_frame_id =
-    this->declare_parameter<std::string>("base_frame_id", "world");
+    this->declare_parameter<std::string>("base_frame_id", "base_link");
   controller_->base_pose_topic =
     this->declare_parameter<std::string>("base_pose_topic", "/optitrack/base_pose");
   controller_->control_mode =
     this->declare_parameter<std::string>("control_mode", "generalized_jacobian");
+  controller_->require_live_base_pose =
+    this->declare_parameter<bool>("require_live_base_pose", false);
   controller_->joint_position_gain =
     this->declare_parameter<double>("joint_position_gain", 2.0);
   controller_->task_space_gain =
@@ -306,6 +310,17 @@ PfrLowLevelControl::PfrLowLevelControl()
     }
     controller_->ee_frame_id = controller_->model.getBodyId(ee_frame);
 
+    if (!controller_->require_live_base_pose) {
+      geometry_msgs::msg::Pose default_base_pose;
+      default_base_pose.orientation.w = 1.0;
+      setFloatingBaseConfiguration(
+        default_base_pose, controller_->q, controller_->base_q_index);
+      controller_->base_pose_received = true;
+      RCLCPP_INFO(
+        this->get_logger(),
+        "Using default base pose at the world origin until a live base pose is received.");
+    }
+
     Eigen::Matrix<double, 6, Eigen::Dynamic> neutral_jacobian(
       6, controller_->model.nv);
     neutral_jacobian.setZero();
@@ -391,6 +406,7 @@ void PfrLowLevelControl::basePoseCallback(const geometry_msgs::msg::PoseStamped 
   setFloatingBaseConfiguration(
     pose.pose, controller_->q, controller_->base_q_index);
   controller_->base_pose_received = true;
+  controller_->live_base_pose_received = true;
   controller_->last_base_pose_time = this->now();
 }
 
@@ -445,8 +461,11 @@ void PfrLowLevelControl::controlTimerCallback()
   }
 
   const rclcpp::Time now = this->now();
+  const bool require_fresh_base_pose =
+    controller_->require_live_base_pose || controller_->live_base_pose_received;
   const bool input_is_stale =
-    (now - controller_->last_base_pose_time).seconds() > controller_->command_timeout_s ||
+    (require_fresh_base_pose &&
+    (now - controller_->last_base_pose_time).seconds() > controller_->command_timeout_s) ||
     (now - controller_->last_joint_state_time).seconds() > controller_->command_timeout_s ||
     (now - controller_->last_pose_reference_time).seconds() > controller_->command_timeout_s ||
     (now - controller_->last_twist_reference_time).seconds() > controller_->command_timeout_s;

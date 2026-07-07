@@ -10,6 +10,8 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
     urdf_path = LaunchConfiguration("urdf_path")
     start_hardware = LaunchConfiguration("start_hardware")
+    base_frame_id = LaunchConfiguration("base_frame_id")
+    base_pose_topic = LaunchConfiguration("base_pose_topic")
 
     dynamixel_bringup = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -34,6 +36,8 @@ def generate_launch_description():
         parameters=[{
             "use_sim_time": use_sim_time,
             "urdf_path": urdf_path,
+            "base_frame_id": base_frame_id,
+            "base_pose_topic": base_pose_topic,
         }],
     )
 
@@ -54,6 +58,16 @@ def generate_launch_description():
             "start_hardware",
             default_value="true",
             description="Start the Dynamixel hardware and ros2_control controllers.",
+        ),
+        DeclareLaunchArgument(
+            "base_frame_id",
+            default_value="base_link",
+            description="Reference frame for published end-effector poses.",
+        ),
+        DeclareLaunchArgument(
+            "base_pose_topic",
+            default_value="/optitrack/base_pose",
+            description="Live floating-base pose topic used when available.",
         ),
         dynamixel_bringup,
         state_estimator,

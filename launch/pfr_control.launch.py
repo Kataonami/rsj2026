@@ -4,8 +4,9 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, PythonExpression
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -14,7 +15,19 @@ def generate_launch_description():
     urdf_path = LaunchConfiguration("urdf_path")
     start_hardware = LaunchConfiguration("start_hardware")
     start_rviz = LaunchConfiguration("start_rviz")
-    low_level_control_mode = LaunchConfiguration("low_level_control_mode")
+    use_optitrack = LaunchConfiguration("use_optitrack")
+    base_pose_topic = LaunchConfiguration("base_pose_topic")
+    optitrack_is_enabled = ["'", use_optitrack, "'.lower() in ['true', '1', 'yes', 'on']"]
+    low_level_control_mode = PythonExpression([
+        "'generalized_jacobian' if ", *optitrack_is_enabled, " else 'analytic_ik'"
+    ])
+    require_live_base_pose = ParameterValue(
+        PythonExpression(optitrack_is_enabled),
+        value_type=bool,
+    )
+    base_frame_id = PythonExpression([
+        "'world' if ", *optitrack_is_enabled, " else 'base_link'"
+    ])
     launch_dir = Path(__file__).resolve().parent
 
     joy = IncludeLaunchDescription(
@@ -27,6 +40,8 @@ def generate_launch_description():
             "use_sim_time": use_sim_time,
             "urdf_path": urdf_path,
             "start_hardware": start_hardware,
+            "base_frame_id": base_frame_id,
+            "base_pose_topic": base_pose_topic,
         }.items(),
     )
 
@@ -51,6 +66,9 @@ def generate_launch_description():
             "urdf_path": urdf_path,
             "control_rate_hz": 50.0,
             "control_mode": low_level_control_mode,
+            "require_live_base_pose": require_live_base_pose,
+            "base_frame_id": base_frame_id,
+            "base_pose_topic": base_pose_topic,
         }],
     )
 
@@ -104,11 +122,17 @@ def generate_launch_description():
             description="Start RViz with desired and actual end-effector paths.",
         ),
         DeclareLaunchArgument(
-            "low_level_control_mode",
-            default_value="generalized_jacobian",
+            "use_optitrack",
+            default_value="true",
             description=(
-                "Low-level mode: 'generalized_jacobian' or 'analytic_ik'."
+                "Use OptiTrack/live floating-base mode. If false, use fixed-base "
+                "analytic IK with the base at the origin."
             ),
+        ),
+        DeclareLaunchArgument(
+            "base_pose_topic",
+            default_value="/optitrack/base_pose",
+            description="Live floating-base pose topic for OptiTrack mode.",
         ),
         pfr_bringup,
         joy,
